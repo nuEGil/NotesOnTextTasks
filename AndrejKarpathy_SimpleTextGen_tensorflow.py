@@ -129,4 +129,7 @@ if __name__ == '__main__':
     output = transformer.predict(transformer_input)
     print(output.shape)
     print(output)
+    
+    # have the correct shape of output and logits as we had in the 
+    # pytorch example. 
     # now we have a get batch function. 

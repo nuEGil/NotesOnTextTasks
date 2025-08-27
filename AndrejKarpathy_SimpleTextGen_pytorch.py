@@ -183,7 +183,7 @@ if __name__ == '__main__':
     Bmod = ModelCheck(text_data_train)
 
     # train the model .. done. -- at the end of training you'll get some less nonsense text 
-
+    # easy to add a step to get validation loss and plot the 2 but we have all the major pieces. 
     modeltraining(Bmod, text_data_train, 
                   block_size=8, batchsize = 32,
                   N_steps = 50000)
