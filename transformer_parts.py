@@ -247,20 +247,104 @@ class Transformer(tf.keras.Model):
     # Return the final output and the attention weights.
     return logits
 
-# loss functions 
-def masked_sparse_ce(from_logits=True):
-    raw = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=from_logits, reduction="none")
+
+## Curiculum 
+class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+  def __init__(self, d_model, warmup_steps=4000):
+    super().__init__()
+
+    self.d_model = d_model
+    self.d_model = tf.cast(self.d_model, tf.float32)
+
+    self.warmup_steps = warmup_steps
+
+  def __call__(self, step):
+    step = tf.cast(step, dtype=tf.float32)
+    arg1 = tf.math.rsqrt(step)
+    arg2 = step * (self.warmup_steps ** -1.5)
+
+    return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
+
+
+def masked_loss(label, pred):
+  # I think the tutorial needs these to be one hot though. -- my data loader doesnt do that. 
+  mask = label != 0
+  loss_object = tf.keras.losses.SparseCategoricalCrossentropy(
+    from_logits=True, reduction='none')
+  loss = loss_object(label, pred)
+
+  mask = tf.cast(mask, dtype=loss.dtype)
+  loss *= mask
+
+  loss = tf.reduce_sum(loss)/tf.reduce_sum(mask)
+  return loss
+
+
+def masked_accuracy(label, pred):
+  pred = tf.argmax(pred, axis=2)
+  label = tf.cast(label, pred.dtype)
+  match = label == pred
+
+  mask = label != 0
+
+  match = match & mask
+
+  match = tf.cast(match, dtype=tf.float32)
+  mask = tf.cast(mask, dtype=tf.float32)
+  return tf.reduce_sum(match)/tf.reduce_sum(mask)
+
+
+
+def make_token_ce(vocab_size: int, reduction: str = "mean"):
+    """
+    Returns a Keras-compatible loss function that:
+      - reshapes y_true: (B, T) -> (B*T,)
+      - reshapes y_pred: (B, T, V) -> (B*T, V)  where V == vocab_size
+    Computes sparse categorical cross-entropy from logits.
+    """
+    assert reduction in {"mean", "sum", "none"}
+
     def loss_fn(y_true, y_pred):
-        # y_true: (b, L), y_pred: (b, L, V)
-        mask = tf.cast(tf.not_equal(y_true, 0), tf.float32)                 # pad=0
-        loss = raw(y_true, y_pred)                                          # (b, L)
-        loss = tf.reduce_sum(loss * mask) / (tf.reduce_sum(mask) + 1e-8)    # mean over non-pad
-        return loss
+        # Flatten labels (ensure int dtype)
+        y_true = tf.reshape(tf.cast(y_true, tf.int32), [-1])           # (B*T,)
+
+        # Flatten logits, forcing last dim to vocab_size
+        logits = tf.reshape(y_pred, [-1, vocab_size])                  # (B*T, V)
+
+        # (Optional) runtime check in graph/eager
+        tf.debugging.assert_equal(
+            tf.shape(logits)[-1], vocab_size,
+            message="Logits last dimension must equal vocab_size"
+        )
+
+        # Sparse CE expects integer labels and raw logits
+        per_token = tf.nn.sparse_softmax_cross_entropy_with_logits(
+            labels=y_true, logits=logits
+        )  # (B*T,)
+
+        if reduction == "sum":
+            return tf.reduce_sum(per_token)
+        elif reduction == "none":
+            return per_token
+        else:  # "mean"
+            return tf.reduce_mean(per_token)
+
     return loss_fn
 
-def masked_sparse_accuracy(y_true, y_pred):
-    # y_true: (b, L), y_pred: (b, L, V)
-    y_pred_ids = tf.argmax(y_pred, axis=-1, output_type=y_true.dtype)       # (b, L)
-    matches = tf.cast(tf.equal(y_true, y_pred_ids), tf.float32)
-    mask = tf.cast(tf.not_equal(y_true, 0), tf.float32)
-    return tf.reduce_sum(matches * mask) / (tf.reduce_sum(mask) + 1e-8)
+# # loss functions 
+# def masked_sparse_ce(from_logits=True):
+#     raw = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=from_logits, reduction="none")
+#     def loss_fn(y_true, y_pred):
+#         # y_true: (b, L), y_pred: (b, L, V)
+#         mask = tf.cast(tf.not_equal(y_true, 0), tf.float32)                 # pad=0
+#         loss = raw(y_true, y_pred)                                          # (b, L)
+#         loss = tf.reduce_sum(loss * mask) / (tf.reduce_sum(mask) + 1e-8)    # mean over non-pad
+#         return loss
+#     return loss_fn
+
+# def masked_sparse_accuracy(y_true, y_pred):
+#     # y_true: (b, L), y_pred: (b, L, V)
+#     y_pred_ids = tf.argmax(y_pred, axis=-1, output_type=y_true.dtype)       # (b, L)
+#     matches = tf.cast(tf.equal(y_true, y_pred_ids), tf.float32)
+#     mask = tf.cast(tf.not_equal(y_true, 0), tf.float32)
+#     return tf.reduce_sum(matches * mask) / (tf.reduce_sum(mask) + 1e-8)

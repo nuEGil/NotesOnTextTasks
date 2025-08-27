@@ -51,7 +51,7 @@ def GetBatch(input_data, block_size=8, batch_size=32):
 class BigramLanguageModel(nn.Module):
     def __init__(self, vocab_size):
         super().__init__()
-        # each token directly reads off the logits for the next token froma  lookup table
+        # each token directly reads off the logits for the next token froma lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, vocab_size)
 
     def forward(self, idx, targets=None):

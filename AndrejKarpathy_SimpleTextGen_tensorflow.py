@@ -2,6 +2,11 @@ import os
 import numpy as np 
 import tensorflow as tf
 from transformer_parts import *
+'''follow this 
+https://www.tensorflow.org/text/tutorials/transformer#data_handling
+
+Skeleton implementation of this thing. 
+'''
 def LoadTextChars(fpath):
     '''Nothing fancy text reader. we want to load text 
     so that it is already structured just get character sequences
@@ -25,7 +30,59 @@ def CharEncodingTool(chars_):
     decode  = lambda l : ''.join(int_to_string[i] for i in l) # decoder -- convert integers to output string
     return encode, decode
 
-# Basic model for testing purposes
+def GetBatch(input_data, block_size=8, batch_size=32):
+    ''' we want to have 2 arrays of size (batch_size, block_size)
+    and we want them to be offset of eachother by 1, so that the input 
+    is a sequence, and the output is the sequence 1 time step into the future.
+
+    Something is up with the way we are selecting the text sequences but whatever. 
+    ''' 
+    X_ = np.zeros((batch_size, block_size))
+    Y_ = np.zeros_like(X_)
+    # create a batch
+    for i in range(batch_size):
+        ix = np.random.randint(0, len(input_data)-block_size)
+        # print('IX: ', ix)
+        X_[i,...]= 0+input_data[ix:ix+block_size]
+        Y_[i,...]= 0+input_data[1+ix:1+ix+block_size]
+    return np.array(X_), np.array(Y_)
+
+def GenerateTextViaTransformer(decoder, model, block_size,  max_new_tokens = 100):
+    # in karpathy's example he was generating tokens in a lst of max new token
+    print('generating text')
+    # x_start = tf.convert_to_tensor(np.zeros((1,block_size)))
+    # y_start = tf.convert_to_tensor(np.zeros((1,block_size)))
+    x_start = np.zeros((1,block_size))
+    y_start = np.zeros((1,block_size))
+    token_sequence = [0]
+    for ji in range(max_new_tokens):
+        # the start token is 0 -> new line right
+        output = model.predict([x_start, y_start])[0,-1,:] # only get the last logit right
+        # print(type(output))        
+        # # apply softmax on this thing so you now have a probability distribution 
+        softmax_output = tf.nn.softmax(tf.convert_to_tensor(output))
+        softmax_output = softmax_output.numpy().astype(np.float64)
+        # print('softmax output shape ',softmax_output.shape)
+        # print(softmax_output)
+        # now sample the multinomial distribution --> soft max made a proability distribution, 
+        # you want to get 1 semple from that distribution -- the length of the soft max will 
+        # tell it the numbers -  so it probability of 0,vocabsize pretty much.
+        new_token = np.argmax(np.random.multinomial(n = 1, pvals = softmax_output))
+        # print('new token ', new_token)
+
+        # append the new token
+        token_sequence.append(new_token)
+
+        # update the buffer for x and y start
+        x_start=0+y_start # update to whatever y_start currently is
+        # now put the new token into y _start
+        y_start[0, 0:-1] =0+y_start[0, 1::]
+        y_start[0, -1] = 0+new_token
+
+        # print(x_start)
+        # print(y_start)
+    stringout = decoder(token_sequence) 
+    print('string out : ', stringout)
 
 if __name__ == '__main__':
     '''Doing this at the character level sets this code up for use with gene sequencing and SMILEs    
@@ -86,21 +143,6 @@ if __name__ == '__main__':
     
     # so need minibacthes of text next so we can train on multiple sequences in parallel
     np.random.seed(8272025)
-
-    def GetBatch(input_data, block_size=8, batch_size=32):
-        ''' we want to have 2 arrays of size (batch_size, block_size)
-        and we want them to be offset of eachother by 1, so that the input 
-        is a sequence, and the output is the sequence 1 time step into the future.
-        ''' 
-        X_ = []
-        Y_ = []
-        # create a batch
-        for i in range(batch_size):
-            ix = int(len(input_data)*np.random.rand()) - block_size #dont reference anything at the end of the file
-            # print('IX: ', ix)
-            X_.append(input_data[ix:ix+block_size])
-            Y_.append(input_data[1+ix:1+ix+block_size])
-        return np.array(X_), np.array(Y_)
     
     # test it out on the training data. 
     X, Y = GetBatch(text_data_train, block_size=8, batch_size=4)   
@@ -112,14 +154,20 @@ if __name__ == '__main__':
     ######
     # split off point in the tutorial. 
     # I want to make use of the TensorFlow for no
+    num_layers = 2
+    d_model = 64
+    num_heads = 4
+    dff = 256
+
     transformer = Transformer(
-                        num_layers=2,
-                        d_model=64,
+                        num_layers=num_layers,
+                        d_model=d_model,
                         num_heads=4,
-                        dff=256,
+                        dff=dff,
                         input_vocab_size=vocab_size ,
                         target_vocab_size=vocab_size ,
                         dropout_rate=0.1)
+    
     print(transformer.summary()) 
     # final layer output is this (batch_size, target_len, target_vocab_size)
     
@@ -127,9 +175,31 @@ if __name__ == '__main__':
     # this next one is the call
     transformer_input= [X,Y]
     output = transformer.predict(transformer_input)
+    # so we are at the level of logits. The channels dimension is equal to the vocabulary size
+    # so (Batch, Tokens, Channels) -> (B,T,C)
     print(output.shape)
-    print(output)
+
+    # now make the learning rate change on a schedule    
+    # learning_rate = CustomSchedule(d_model)
+    # make an adam optimizer object with that learning rate
+    # transformer so the learning rate really matters -- its a lot of params
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-6, beta_1=0.9, 
+                                        beta_2=0.98, epsilon=1e-9)
     
-    # have the correct shape of output and logits as we had in the 
-    # pytorch example. 
-    # now we have a get batch function. 
+    # loss function is janky. In other examples we would just one hot encode Y and call it a day. 
+    transformer.compile(loss = make_token_ce(vocab_size,), optimizer=optimizer, metrics = [masked_accuracy])
+
+    GenerateTextViaTransformer(decode, transformer, block_size=block_size, max_new_tokens = 10)
+    # X__ ,Y__ = GetBatch(text_data_train, block_size=8, batch_size= 512)
+    # transformer.fit(x=[X__,Y__], y=Y__, epochs=10, batch_size = 32, )
+    
+    # Train the model 
+
+    # work around -- get one really large batch and pass it to fit. it will figure it out;
+    # the other thing is that this model is going to be large -- so you'll need a lot of data for 
+    # these token sequences to be of any use 
+    X__ ,Y__ = GetBatch(text_data_train, block_size=8, batch_size= 50000) 
+
+    # I want to reshape Y to be (batch_size* block_size), and out  to be (batch_size* blocksize, logits)
+    transformer.fit(x=[X__,Y__], y = Y__, epochs=10, batch_size = 128, )
+    GenerateTextViaTransformer(decode, transformer, block_size=block_size, max_new_tokens = 100)
