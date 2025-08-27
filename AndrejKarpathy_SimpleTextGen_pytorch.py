@@ -4,6 +4,11 @@ import torch
 import torch.nn as nn 
 from torch.nn import functional as F
 
+# move data back and forth from the GPU when it is available
+# need to move the model and the actual x and y variables to 
+# the GPU too.
+# device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 def LoadTextChars(fpath):
     '''Nothing fancy text reader. we want to load text 
     so that it is already structured just get character sequences
@@ -46,6 +51,7 @@ def GetBatch(input_data, block_size=8, batch_size=32):
         # print('IX: ', ix)
         X_[i,...]= 0+input_data[ix:ix+block_size]
         Y_[i,...]= 0+input_data[1+ix:1+ix+block_size]
+
     return np.array(X_), np.array(Y_)
 
 class BigramLanguageModel(nn.Module):
