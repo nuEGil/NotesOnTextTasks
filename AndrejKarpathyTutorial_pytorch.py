@@ -30,6 +30,17 @@ def CharEncodingTool(chars_):
 
 # Basic model for testing purposes
 
+class BigramLanguageModel(nn.Module):
+    def __init__(self, vocab_size):
+        super().__init__()
+        # each token directly reads off the logits for the next token froma  lookup table
+        self.token_embedding_table = nn.Embedding(vocab_size, vocab_size)
+
+    def forward(self, idx, targets):
+        #idx and targets are both (B,T) tensor of integers
+        logits = self.token_embedding_table(idx) # (B,T,C)
+        return logits
+
 if __name__ == '__main__':
     '''Doing this at the character level sets this code up for use with gene sequencing and SMILEs    
     You could do it at the word level though if your application is to learn something about words. 
@@ -95,22 +106,17 @@ if __name__ == '__main__':
     
     # test it out on the training data. 
     X, Y = GetBatch(text_data_train, block_size=8, batch_size=4)   
+    def convert_to_tensor(X,Y):
+        return torch.from_numpy(X),torch.from_numpy(Y) 
+    X, Y = convert_to_tensor(X,Y)
     print(X.shape)
     print(Y.shape)
     print(X)
     print(Y)
 
     ######
-    class BigramLanguageModel(nn.Module):
-        def __init__(self, vocab_size):
-            super.__init__()
-            # each token directly reads off the logits for the next token froma  lookup table
-            self.token_embedding_table = nn.Embedding(vocab_size, vocab_size)
-
-        def forward(self, idx, targets):
-            #idx and targets are both (B,T) tensor of integers
-            logits = self.token_embedding_table(idx) # (B,T,C)
-            return logits
+   
         
     Bmod =  BigramLanguageModel(vocab_size=vocab_size)
-    out = Bmod 
+    out = Bmod (X, Y)
+    print(out.shape)
