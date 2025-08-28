@@ -22,6 +22,21 @@ Trained on masked language modeling objective.
 ok this exmample loads up BERT Turns out any google account has access to google collab which comes with huging face transformers preinstalled
 So build your apps there. 
 
+## x-ray images 
+1. patchmaker.py -- use this to extract patches from the main image that we can train on 
+2. local_tf_ResNetTuner.py
 
-TODO: knowledge graph implementation 
+# Todo list
+1. knowledge graph implementation 
 
+2. tf or pytorch - local model: Fine Tune a ResNet model on image patches of chest x-rays, and use that to do a segmentation 
+    finetuning done --> implmement a contrastive learning algorithm next. 
+
+3. tf - local model : Train a U-Net to segment out the chest x-ray. 
+
+4. Google colab --> import the trained U-Net model to do the semgnetaiton , then use a multimodal text + vision model 
+
+look into texts that are publicly available, that you might fine tune a model for chest anatomy knowledge.... likely would need 
+the pairs to get this to actually work, but we have time now for a proof of conceptat least. 
+
+may implement vision transformer- but resnet and U-Net have been pretty effective for my use cases so far -- see convnet for the 2020s paper. 
