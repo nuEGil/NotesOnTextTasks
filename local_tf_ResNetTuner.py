@@ -10,6 +10,16 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 This is just to demonstrate the ability to load pretrained models, and fine tune them. 
 '''
 
+# # To use a specific GPU (e.g., the first one, index 0)
+# gpus = tf.config.list_physical_devices('GPU')
+# if gpus:
+#     try:
+#         tf.config.set_visible_devices(gpus[0], 'GPU')
+#         logical_gpus = tf.config.list_logical_devices('GPU')
+#         print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+#     except RuntimeError as e:
+#         print(e)
+
 def get_args():
     parser = argparse.ArgumentParser(description="Extract image patches with stride.")
     parser.add_argument("--file", type=str, required=False, help="Path to the input file")
@@ -26,16 +36,30 @@ def load_baseimg(path, image_size):
     return preprocess_input(img)
 
 def preliminary_labels():
+    # base model is ResNet50
     base = tf.keras.applications.ResNet50(weights="imagenet", include_top=True, input_shape=(224,224,3))
-    
+    # read the patch data
     patch_data = pd.read_csv(args.file)
+    
+    #without training - assign a label to every patch 
     labels = []
     for ii in range(patch_data.shape[0]):
         path_ = patch_data["patch_path"].iloc[ii]
         patch_ = load_baseimg(path_, 224)
         labels.append(np.argmax(base.predict(patch_)[0]))
-    print(labels)
+    # print(labels)
     patch_data["labels"] = labels
+    
+    # get the unique classes 
+    unique_classes = patch_data["labels"].unique()
+    num_classes = len(unique_classes)
+
+    # make a mapping {class_name: index}
+    class_to_idx = {cls: idx for idx, cls in enumerate(unique_classes)}
+
+    # update df with new integer labels
+    patch_data["label_idx"] = patch_data["labels"].map(class_to_idx)
+    # now save the csv for labeled images. 
     patch_data.to_csv(args.file.replace('.csv', '_labeled.csv'))
 
 # ok then run this section to actually train a new model 
@@ -85,9 +109,9 @@ if __name__ == "__main__":
     args = get_args()
     # Load ResNet50 pretrained on ImageNet
     ## get the labels if you need to
-    # preliminary_labels()
+    preliminary_labels()
     
-    # train 
-    train_model(args.labeled_file)
+    # # train 
+    # train_model(args.labeled_file)
     
 
