@@ -6,19 +6,8 @@ import tensorflow as tf
 from tensorflow.keras.applications.resnet50 import preprocess_input
 
 ''' the new way to do segmentation would be to take a newtork architecture, and pretrain it with contrastive learning right. 
-
 This is just to demonstrate the ability to load pretrained models, and fine tune them. 
 '''
-
-# # To use a specific GPU (e.g., the first one, index 0)
-# gpus = tf.config.list_physical_devices('GPU')
-# if gpus:
-#     try:
-#         tf.config.set_visible_devices(gpus[0], 'GPU')
-#         logical_gpus = tf.config.list_logical_devices('GPU')
-#         print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-#     except RuntimeError as e:
-#         print(e)
 
 def get_args():
     parser = argparse.ArgumentParser(description="Extract image patches with stride.")
@@ -35,11 +24,11 @@ def load_baseimg(path, image_size):
     print('imshape ',img.shape)
     return preprocess_input(img)
 
-def preliminary_labels():
+def preliminary_labels(myfile):
     # base model is ResNet50
     base = tf.keras.applications.ResNet50(weights="imagenet", include_top=True, input_shape=(224,224,3))
     # read the patch data
-    patch_data = pd.read_csv(args.file)
+    patch_data = pd.read_csv(myfile)
     
     #without training - assign a label to every patch 
     labels = []
@@ -60,7 +49,7 @@ def preliminary_labels():
     # update df with new integer labels
     patch_data["label_idx"] = patch_data["labels"].map(class_to_idx)
     # now save the csv for labeled images. 
-    patch_data.to_csv(args.file.replace('.csv', '_labeled.csv'))
+    patch_data.to_csv(myfile.replace('.csv', '_labeled.csv'))
 
 # ok then run this section to actually train a new model 
 def df_to_dataset(df, image_size=64, batch_size=32, shuffle=True):
@@ -80,13 +69,6 @@ def train_model(file_w_labels):
     patch_data = pd.read_csv(file_w_labels)
     unique_classes = patch_data["labels"].unique()
     num_classes = len(unique_classes)
-
-    # make a mapping {class_name: index}
-    class_to_idx = {cls: idx for idx, cls in enumerate(unique_classes)}
-
-    # update df with new integer labels
-    patch_data["label_idx"] = patch_data["labels"].map(class_to_idx)
-
 
     train_df = patch_data.sample(frac=0.9, random_state=42)
     test_df = patch_data.drop(train_df.index)
@@ -109,9 +91,13 @@ if __name__ == "__main__":
     args = get_args()
     # Load ResNet50 pretrained on ImageNet
     ## get the labels if you need to
-    preliminary_labels()
+    if args.file:
+        print(args.file)
+        preliminary_labels(args.file)
     
     # # train 
-    # train_model(args.labeled_file)
+    if args.labeled_file:
+        print(args.labeled_file)
+        train_model(args.labeled_file)
     
 
