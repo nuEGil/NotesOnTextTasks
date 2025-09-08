@@ -3,8 +3,6 @@ import tensorflow as tf
 '''Follow this guide 
 https://www.tensorflow.org/text/tutorials/transformer
 '''
-
-
 # --- Positional encoding (sin/cos) ---
 def positional_encoding(length, depth):
   depth = depth/2
