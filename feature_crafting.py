@@ -81,20 +81,18 @@ def GetSentences(text,):
     return sentences
 
 def GetNouns(sentences):
+    # if you want to get full names you might have to get a regular expression... 
     # itterate through sentences
     nouns = []
     for sentence in sentences:
         words = sentence.split()
         # print(words)
         for wi, w in enumerate(words):
-            if len(w)>1:
+            w = ''.join([w_ for w_ in w if w_.isalnum()])
+            if len(w)>3:
                 if wi>=1 and w[0].isupper() and not w[1].isupper():
-                    w = ''.join([w_ for w_ in w if w_.isalnum()])
                     nouns.append(w)
-
-
     print(sorted(list(set(nouns))))
-
     return 0
 
 if __name__ == '__main__':
