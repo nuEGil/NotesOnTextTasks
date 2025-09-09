@@ -47,7 +47,9 @@ def GetSentences(text,):
     # get lines but join them by space
     clean_text = ' '.join(text.splitlines())
     # sentence terminators
-    punctuations = ['...', '.', '!', '?']
+    # punctuations = ['...', '..', '. ', '!', '?']
+    # put a space after the punctuation for it to be a line terminator
+    punctuations = ['. ', '! ', '? ']
     # use regext to get all the indices in a dicitonary 
     indices = {p: [m.start() for m in re.finditer(re.escape(p), clean_text)] for p in punctuations}
 
@@ -68,8 +70,9 @@ def GetSentences(text,):
     for sentence_id in range(0,n_sentences):
         # sentence_id = n_sentences-1
         # sentence_id = 190
-        sentence = clean_text[full_inds[sentence_id]:full_inds[sentence_id+1]+1]
+        sentence = clean_text[full_inds[sentence_id]+2:full_inds[sentence_id+1]+1]
         sentences.append(sentence)
+        # print('--'+sentence)
 
     # print(sentence.split())
     # {'.': [27, 46], '!': [11], '?': [41]}
@@ -79,35 +82,19 @@ def GetSentences(text,):
 
 def GetNouns(sentences):
     # itterate through sentences
+    nouns = []
     for sentence in sentences:
         words = sentence.split()
-        print(words)
-        # for wi, w in enumerate(words):
-        #     # now I need logic for the words.... 
+        # print(words)
+        for wi, w in enumerate(words):
+            if len(w)>1:
+                if wi>=1 and w[0].isupper() and not w[1].isupper():
+                    w = ''.join([w_ for w_ in w if w_.isalnum()])
+                    nouns.append(w)
 
 
-    # def word_classigfier(x, xi):
-    #     if len(x)>3 and xi>2:
-    #         if x[0].isupper() and not x[1].isupper():
-    #             return True
-    #         else:
-    #             return False
-    #     else:
-    #         return False
+    print(sorted(list(set(nouns))))
 
-    # nouns = []
-    # ji = 0
-    # for sentence in sentences:
-    #     words = sentence.split() # need a second signal here. Need to see if the word is not the first in the sentence
-        
-    #     nouns.extend([w for wi, w in enumerate(words) if word_classigfier(w, wi )])
-    #     ji+=1
-    #     if ji>500:
-    #         break
-    # print('nouns ', sorted(set(nouns)))
-    # estimate of some nouns, After you get the frequency with which the nouns return you could probably 
-    # threshold that to get the story characters or something. idk. 
-    # return set(nouns)
     return 0
 
 if __name__ == '__main__':
