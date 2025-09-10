@@ -57,6 +57,12 @@ Also, by no means are we going for efficiency with this code.
 Podcast analyzer is going to be different -- we have different speakers. 
 So you need to grab the text by the time stamps. 
 
+so these sets of tools.... likely you make a class for processing text in 
+project gutten berg books... 
+
+and then another class for working with lex podcasts. 
+especially because the Lex Stuff is real conversations.. 
+
 '''
 
 import re 
@@ -64,12 +70,10 @@ import argparse
 import numpy as np 
 import matplotlib.pyplot as plt 
 
-
 def get_args():
     parser = argparse.ArgumentParser(description="Extract image patches with stride.")
     parser.add_argument("--file", type=str, required=False, help="Path to the input file")
     return parser.parse_args()
-
 
 # This is probably a class right here. ----
 def GetText(x):
@@ -228,8 +232,8 @@ def FirstRead(Book):
 
 if __name__ == '__main__':
     xargs = get_args()
-    # Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
-    Book = '/mnt/f/podcast/Lex Fridman Transcript for Keyu Jin Chinas Eco.txt'
+    Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
+    # Book = '/mnt/f/podcast/Lex Fridman Transcript for Keyu Jin Chinas Eco.txt'
     # Book = '/mnt/f/ebooks_public_domain/Time machine.txt'
     # Book = xargs.file 
     book_dat = FirstRead(Book)
@@ -245,7 +249,13 @@ if __name__ == '__main__':
     word_signal = np.ones((book_dat['Tn_words'],))
     for ind_ in new_word_inds:
         word_signal[ind_::]+=1
-    
+
+    # now if you curve fit the word signal right.. and substract the fit plot
+    # you should get a signal that spikes either up or down
+    # positive zeros should tell you one thing, and negative zeros should tell you another. 
+    # then once you have those points, you should be able to jump right to that spot in the text. 
+
+
     # plotting
     fig, axes = plt.subplots(2, 2, figsize=(8, 6))
 
@@ -253,6 +263,13 @@ if __name__ == '__main__':
     axes[0,0].set_ylabel('index a new word was introduced')
     axes[0,0].set_xlabel('word id')
     
+    # this interval will be longer toward the end -- you care about spikes
+    # from the base line -- it should mean something when the inteval spikes or drops 
+    # for some reason -- that difference should give you like a normalized version of the 
+    # interval between words signal. More words should mean the speaker is introducing a new concept
+    # less words means the speaker is either elaborating or in a lull. 
+
+
     axes[0,1].plot(np.diff(new_word_inds))
     axes[0,1].set_ylabel('interval between new words')
     axes[0,1].set_xlabel('word id')
@@ -260,7 +277,12 @@ if __name__ == '__main__':
     axes[1,0].plot(word_signal)
     axes[1,0].set_ylabel('number of unique words')
     
+    # # this should be 1s and 0s so not meaningful... 
+    # axes[1,1].plot(np.diff(word_signal))
+    # axes[1,1].set_ylabel('diff number of unique words')
+
     # this should be 1s and 0s so not meaningful... 
-    axes[1,1].plot(np.diff(word_signal))
-    axes[1,1].set_ylabel('diff number of unique words')
+    axes[1,1].plot(np.diff(new_word_inds) / new_word_inds[1::])
+    axes[1,1].set_ylabel('normalized interval between new words')
+    axes[1,1].set_xlabel('word id')
     plt.savefig('word_signals.png')
