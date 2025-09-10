@@ -54,11 +54,16 @@ passages to the network? Context doesnt have to be the whole file.
 --- 
 Also, by no means are we going for efficiency with this code. 
 
+Podcast analyzer is going to be different -- we have different speakers. 
+So you need to grab the text by the time stamps. 
+
 '''
 
 import re 
 import argparse
 import numpy as np 
+import matplotlib.pyplot as plt 
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="Extract image patches with stride.")
@@ -136,7 +141,7 @@ def GetWordsAndInds(text, special_chars = '.'):
     
     # now you have every word in order of occurence 
     words = f_text.split()
-    
+    total_n_words = len(words)
     uwords = set()
     uwords_and_locs = []
     for wi, word_ in enumerate(words):
@@ -146,7 +151,7 @@ def GetWordsAndInds(text, special_chars = '.'):
         if not filtered_word in uwords:
             uwords.add(filtered_word)        
             uwords_and_locs.append([filtered_word,wi])
-    return uwords_and_locs
+    return uwords_and_locs, total_n_words
 # end of the class right here -- these can group together. 
 
 def GetNounsFromSentence(text_):
@@ -186,11 +191,13 @@ def FirstRead(Book):
     chars, special_chars = GetCharacters(text)
 
     # words = GetWords(text, special_chars = special_chars)
-    uwords_and_locs = GetWordsAndInds(text, special_chars = special_chars)
+    uwords_and_locs, total_n_words = GetWordsAndInds(text, special_chars = special_chars)
 
+    print('Total Book characters : ', len(text))
     print('Total unique chars : ', len(chars))
     # print('Total unique words : ', len(words))
-    print('Total U words : ', len(uwords_and_locs))
+    print('Total number of words : ', total_n_words)
+    print('Total number of unique words : ', len(uwords_and_locs))
     print('Total sentences : ', len(sentences))
     print('Total paragraphs : ', len(paragraphs))
 
@@ -210,17 +217,20 @@ def FirstRead(Book):
         'nouns' : nouns,
         'chars' : chars,
         'special_chars' : special_chars,
+        'Tn_chars': len(text),
         'Tn_unique_chars': len(chars),
-        'Tn_words' : len(uwords_and_locs),
+        'Tn_words' : total_n_words,
+        'Tn_uwords' : len(uwords_and_locs),
         'Tn_paragraphs': len(paragraphs)
         }
     
     return data
 
-
 if __name__ == '__main__':
     xargs = get_args()
-    Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
+    # Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
+    Book = '/mnt/f/podcast/Lex Fridman Transcript for Keyu Jin Chinas Eco.txt'
+    # Book = '/mnt/f/ebooks_public_domain/Time machine.txt'
     # Book = xargs.file 
     book_dat = FirstRead(Book)
 
@@ -231,4 +241,26 @@ if __name__ == '__main__':
     print(book_dat['sentence_inds'][0:10])
 
     # ok so now if I want to get the character index where the new thing occured
+    new_word_inds = np.array([bd[1] for bd in book_dat['words_and_inds']])
+    word_signal = np.ones((book_dat['Tn_words'],))
+    for ind_ in new_word_inds:
+        word_signal[ind_::]+=1
     
+    # plotting
+    fig, axes = plt.subplots(2, 2, figsize=(8, 6))
+
+    axes[0,0].plot(new_word_inds)
+    axes[0,0].set_ylabel('index a new word was introduced')
+    axes[0,0].set_xlabel('word id')
+    
+    axes[0,1].plot(np.diff(new_word_inds))
+    axes[0,1].set_ylabel('interval between new words')
+    axes[0,1].set_xlabel('word id')
+    
+    axes[1,0].plot(word_signal)
+    axes[1,0].set_ylabel('number of unique words')
+    
+    # this should be 1s and 0s so not meaningful... 
+    axes[1,1].plot(np.diff(word_signal))
+    axes[1,1].set_ylabel('diff number of unique words')
+    plt.savefig('word_signals.png')
