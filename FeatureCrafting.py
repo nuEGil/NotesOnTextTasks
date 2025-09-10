@@ -45,10 +45,28 @@ words / sentence
 words / paragraph
 sentence / paragraph
 
+Vocabulary size after each sentence 
+because you might use a new word when you introduce a new idea.
+
+Could you Identify  key points in the text and just pass in those 
+passages to the network? Context doesnt have to be the whole file. 
+
+--- 
+Also, by no means are we going for efficiency with this code. 
+
 '''
 
 import re 
+import argparse
+import numpy as np 
 
+def get_args():
+    parser = argparse.ArgumentParser(description="Extract image patches with stride.")
+    parser.add_argument("--file", type=str, required=False, help="Path to the input file")
+    return parser.parse_args()
+
+
+# This is probably a class right here. ----
 def GetText(x):
     with open(x, "r" ) as f:
         return f.read()
@@ -90,6 +108,47 @@ def GetSentences(text, punctuations = [': ', '. ', '! ', '? ']):
         sentences.append(sentence)
     return sentences, sentence_inds
 
+def GetCharacters(text):
+    # get Unique characters 
+    chars = sorted(list(set(text)))
+    letters = sorted([c for c in chars  if c.isalpha()]) 
+    special_chars = "".join(list(set(chars) - set(letters)))
+    
+    print(chars)
+    print(special_chars)
+    return chars, special_chars
+
+def GetWords(text, special_chars = '!?.'):
+    # get all unique words
+    pattern = "[" + re.escape(special_chars) + "]"
+    f_text = re.sub(pattern, " ", text)
+    words = f_text.split()
+    # words  = [''.join([w_ for w_ in wor.lower() if w_.isalpha()]) for wor in f_text]
+    words = [w_.lower() for w_ in words]
+    words = sorted(list(set(words)))
+    print(words)
+    return words
+
+def GetWordsAndInds(text, special_chars = '.'):
+    pattern = "[" + re.escape(special_chars) + "]"
+    # replace the special character with a space
+    f_text = re.sub(pattern, " ", text)
+    
+    # now you have every word in order of occurence 
+    words = f_text.split()
+    
+    uwords = set()
+    uwords_and_locs = []
+    for wi, word_ in enumerate(words):
+        # now you have an index and each word
+        # I want to know that it is alpha numeric
+        filtered_word = ''.join([fw_ for fw_ in word_.lower() if fw_.isalpha()])
+        if not filtered_word in uwords:
+            uwords.add(filtered_word)        
+            uwords_and_locs.append([filtered_word,wi])
+    return uwords_and_locs
+# end of the class right here -- these can group together. 
+
 def GetNounsFromSentence(text_):
     # sentence is already spaced out text 
     words_ = text_.split()
@@ -101,15 +160,12 @@ def GetNounsFromSentence(text_):
                 nouns.append(w)
     return nouns
 
-if __name__ == '__main__':
-    Book = '/mnt/c/Users/gil82/OneDrive/Documents/books/crime and punishment.txt'
+def FirstRead(Book):
     text = GetText(Book)
-    
     # get all the paragraphs
     paragraphs, paragraph_inds = GetParagraphs(text)
     
     # get all the sentences
-    
     # filter the text so that it is easier to get sentences
     s_text = text.replace('\n\n', ' ')
     s_text = s_text.replace('\n', ' ')
@@ -126,26 +182,53 @@ if __name__ == '__main__':
     all_nouns = sorted(list(set(all_nouns)))
     print(all_nouns)
 
+    # get characters 
+    chars, special_chars = GetCharacters(text)
 
-    # get Unique characters 
-    chars = sorted(list(set(text)))
-    letters = sorted([c for c in chars  if c.isalpha()]) 
-    special_chars = "".join(list(set(chars) - set(letters)))
-    
-    print(chars)
-    print(letters)
-    print(special_chars)
-
-    # get all unique words
-    pattern = "[" + re.escape(special_chars) + "]"
-    f_text = re.sub(pattern, " ", text)
-    words = sorted(list(set(f_text.split())))
-    print(words)
+    # words = GetWords(text, special_chars = special_chars)
+    uwords_and_locs = GetWordsAndInds(text, special_chars = special_chars)
 
     print('Total unique chars : ', len(chars))
-    print('Total unique words : ', len(words))
+    # print('Total unique words : ', len(words))
+    print('Total U words : ', len(uwords_and_locs))
     print('Total sentences : ', len(sentences))
     print('Total paragraphs : ', len(paragraphs))
 
+    # might just bite the bullet and use gpt2 or gemma3 to generate some signals.
+    
+    # Here's the inefficiency bit, there's 3 copies of the text here... 
+    # could probably fix that by just storing indices for paragraphs and sentences
+    # words is the only one that removes characters.... 
+     
+    data = {
+        'text':text,
+        'paragraphs' : paragraphs,
+        'paragraph_inds' : paragraph_inds,
+        'sentences' : sentences,
+        'sentence_inds' : sentence_inds,
+        'words_and_inds': uwords_and_locs,
+        'nouns' : nouns,
+        'chars' : chars,
+        'special_chars' : special_chars,
+        'Tn_unique_chars': len(chars),
+        'Tn_words' : len(uwords_and_locs),
+        'Tn_paragraphs': len(paragraphs)
+        }
+    
+    return data
 
+
+if __name__ == '__main__':
+    xargs = get_args()
+    Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
+    # Book = xargs.file 
+    book_dat = FirstRead(Book)
+
+    # ok so for the next part. I want to calculate a bunch of features from portions of the text. 
+    
+    # you could count how many sentences were in a given paragraph -- you need an index filter though
+    print(book_dat['paragraph_inds'][0:2])
+    print(book_dat['sentence_inds'][0:10])
+
+    # ok so now if I want to get the character index where the new thing occured
     
