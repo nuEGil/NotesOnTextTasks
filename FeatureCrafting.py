@@ -63,12 +63,17 @@ project gutten berg books...
 and then another class for working with lex podcasts. 
 especially because the Lex Stuff is real conversations.. 
 
+
+Implement a guttenberg filter. 
 '''
 
 import re 
 import argparse
+import scipy 
 import numpy as np 
+import pandas as pd
 import matplotlib.pyplot as plt 
+from collections import Counter
 
 def get_args():
     parser = argparse.ArgumentParser(description="Extract image patches with stride.")
@@ -122,9 +127,6 @@ def GetCharacters(text):
     chars = sorted(list(set(text)))
     letters = sorted([c for c in chars  if c.isalpha()]) 
     special_chars = "".join(list(set(chars) - set(letters)))
-    
-    print(chars)
-    print(special_chars)
     return chars, special_chars
 
 def GetWords(text, special_chars = '!?.'):
@@ -194,6 +196,9 @@ def FirstRead(Book):
     # get characters 
     chars, special_chars = GetCharacters(text)
 
+    print('characters : ', chars)
+    print('special characters : ', special_chars)
+
     # words = GetWords(text, special_chars = special_chars)
     uwords_and_locs, total_n_words = GetWordsAndInds(text, special_chars = special_chars)
 
@@ -230,32 +235,19 @@ def FirstRead(Book):
     
     return data
 
-if __name__ == '__main__':
-    xargs = get_args()
-    Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
-    # Book = '/mnt/f/podcast/Lex Fridman Transcript for Keyu Jin Chinas Eco.txt'
-    # Book = '/mnt/f/ebooks_public_domain/Time machine.txt'
-    # Book = xargs.file 
-    book_dat = FirstRead(Book)
-
-    # ok so for the next part. I want to calculate a bunch of features from portions of the text. 
+def plot_word_signals(book_dat):
     
-    # you could count how many sentences were in a given paragraph -- you need an index filter though
-    print(book_dat['paragraph_inds'][0:2])
-    print(book_dat['sentence_inds'][0:10])
-
+    ## Word Signals
     # ok so now if I want to get the character index where the new thing occured
     new_word_inds = np.array([bd[1] for bd in book_dat['words_and_inds']])
     word_signal = np.ones((book_dat['Tn_words'],))
     for ind_ in new_word_inds:
         word_signal[ind_::]+=1
-
-    # now if you curve fit the word signal right.. and substract the fit plot
-    # you should get a signal that spikes either up or down
-    # positive zeros should tell you one thing, and negative zeros should tell you another. 
-    # then once you have those points, you should be able to jump right to that spot in the text. 
-
-
+    
+    # this feature is a bit more expensive to capture. 
+    filt_word_signal = scipy.signal.savgol_filter(word_signal, 31, 2)
+    residual_word_sig = word_signal-filt_word_signal
+    # it does spike up and down a lot, and the 0 crossings should tell you something. but idk yet 
     # plotting
     fig, axes = plt.subplots(2, 2, figsize=(8, 6))
 
@@ -275,6 +267,8 @@ if __name__ == '__main__':
     axes[0,1].set_xlabel('word id')
     
     axes[1,0].plot(word_signal)
+    axes[1,0].plot(filt_word_signal)
+
     axes[1,0].set_ylabel('number of unique words')
     
     # # this should be 1s and 0s so not meaningful... 
@@ -282,7 +276,88 @@ if __name__ == '__main__':
     # axes[1,1].set_ylabel('diff number of unique words')
 
     # this should be 1s and 0s so not meaningful... 
-    axes[1,1].plot(np.diff(new_word_inds) / new_word_inds[1::])
-    axes[1,1].set_ylabel('normalized interval between new words')
+    # axes[1,1].plot(np.diff(new_word_inds) / book_dat['Tn_words'])
+    axes[1,1].plot(residual_word_sig)
+    axes[1,1].set_ylabel('residual word sig')
     axes[1,1].set_xlabel('word id')
     plt.savefig('word_signals.png')
+
+if __name__ == '__main__':
+    xargs = get_args()
+    Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
+    # Book = '/mnt/f/podcast/Lex Fridman Transcript for Keyu Jin Chinas Eco.txt'
+    # Book = '/mnt/f/ebooks_public_domain/Time machine.txt'
+    # Book = xargs.file 
+    book_dat = FirstRead(Book)
+
+    # ok so for the next part. I want to calculate a bunch of features from portions of the text. 
+    
+    # you could count how many sentences were in a given paragraph -- you need an index filter though
+    print(book_dat['paragraph_inds'][0:2])
+    print(book_dat['sentence_inds'][0:10])
+
+    # puncuation variability... over a window.... characters or paragraphs... 
+    paragraph_mean_spchar = []
+    paragraph_std_spchar = []
+    for paragraph in book_dat['paragraphs']:
+
+        counts = dict(zip(list(book_dat['special_chars']),
+                          [0]*len(book_dat['special_chars'])))
+        for ch in paragraph:
+            if ch in counts.keys():
+                counts[ch]+=1
+
+        count_dat = pd.DataFrame.from_dict({'character':counts.keys(), 'count':counts.values()})
+        print(paragraph)
+        # print(count_dat.sort_values(by=count_dat.columns[1]))
+        # now count dat is dropped if it is 0
+        count_dat = count_dat.loc[(count_dat != 0).any(axis=1)]
+        pmean = count_dat.iloc[:,1].mean()
+        pstd = count_dat.iloc[:,1].std()
+        print('average special character count ', pmean)
+        print('std special character count ', pstd)
+
+        paragraph_mean_spchar.append(pmean)
+        paragraph_std_spchar.append(pstd)
+    
+    new_paragraph_data = {
+        'paragraph':book_dat['paragraphs'],
+        'avg_special_char': paragraph_mean_spchar,
+        'std_special_char': paragraph_std_spchar
+        }
+    pd.DataFrame.from_dict(new_paragraph_data).to_csv(Book.replace('.txt', '_pargraph_feats.csv'))
+
+
+    ### end of feature computation 
+
+    paragraph_mean_spchar = np.array(paragraph_mean_spchar)
+    paragraph_std_spchar = np.array(paragraph_std_spchar)
+    
+    rms_mean = np.sqrt(np.mean(paragraph_mean_spchar))
+    rms_std = np.sqrt(np.mean(paragraph_std_spchar))
+    print('rms of paragraph mean num chars ', rms_mean)
+    print('rms of paragraph std num chars ', rms_std)
+    
+    
+    both_conditions = np.where(
+    (paragraph_mean_spchar > 5 * rms_mean) & 
+    (paragraph_std_spchar > 2.5 * rms_std))[0]
+
+
+    print("both conditions:", both_conditions)
+    print("count:", len(both_conditions))
+    
+    fig, axes = plt.subplots(1, 2, figsize=(8, 6))
+    axes[0].plot(paragraph_mean_spchar)
+    axes[0].plot(paragraph_mean_spchar+paragraph_std_spchar)
+    axes[0].plot(paragraph_mean_spchar-paragraph_std_spchar)
+    axes[1].plot(paragraph_mean_spchar)
+    axes[1].axhline(y = 5*rms_mean)
+    axes[1].axhline(y = 2.5*rms_std)
+
+    plt.savefig('punct_var.png')
+
+
+
+
+    
