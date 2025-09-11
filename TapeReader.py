@@ -7,7 +7,13 @@ Look into some other features. -- because then we can use scikit learn to do
 like a bag of features or a decision tree and go nuts with old fashioned AI 
 to detect key points in the text. 
 
-
+Inspired by this youtube viedo https://www.youtube.com/watch?v=j2T4gvQAiaE&t=567s
+-- Make a graph by counting the number of times that two nouns apear together
+-- Take the double caps words and make a square matrix(dictionary of bigrams)
+-- For every sentence (or window = 2, 3, 4, sentences) how many times did that pair come up (non adjacent) 
+-- Normalize counts to get relationship score at every pair 
+-- Monitor relationship score for interesting pairs - looking for changes before and after points in time
+ 
 '''
 def GetText(x):
     with open(x, "r" ) as f:
