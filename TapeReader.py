@@ -1,6 +1,8 @@
 import os 
 import re
 import numpy as np 
+import pandas as pd
+import matplotlib.pyplot as plt 
 '''Need to merge this with FeatureCrafting at some point. 
 get words per sentence 
 get sentence per paragraph
@@ -15,6 +17,19 @@ Inspired by this youtube viedo https://www.youtube.com/watch?v=j2T4gvQAiaE&t=567
 -- Normalize counts to get relationship score at every pair 
 -- Monitor relationship score for interesting pairs - looking for changes before and after points in time
  
+When you do move over to C or C++
+-- Hash the text to get fixed length strings for every word / sentence / paragraph
+-- -- key words like the book players, should be hashed when you're trying to match them
+-- make trees where you can for matching things. 
+-- use a text file with commonly used words to filter out things.
+-- graphs scale O(n^2)
+
+Might need to put in a list of key words and phrases... might not be a way around it. 
+So like marmeladov is a pivitol character in crime and punishment, but his name only 
+comes out like once. Hes a drunk and gets hit by a horse cart, dies, and thats 
+what pushes his family further into poverty, and pushes raskolnikov and sonia(?)
+together. Its one of the catalysts for Raskolnikov turning himself in. 
+
 '''
 def GetText(x):
     with open(x, "r" ) as f:
@@ -131,8 +146,33 @@ def GetWordCounts(X):
             X_counts[x]+=1
     return X_counts
 
+def CleanSpecialChars(text: str) -> str:
+    text = re.sub(r'[^A-Za-z0-9\s]', ' ', text)
+    return re.sub(r'\s+', ' ', text).strip()
+
+def word_to_int(words):
+    # use this to convert words to integers in numpy 
+    # quick text matcher through multiplication -- check for perfect squares
+    return np.array([abs(hash(w.lower())) % 10_000_019 for w in words])
+
+def perfect_square_matches(arr1, arr2):
+    """
+    Compare two arrays of words elementwise.
+    Return a boolean mask where matches form perfect squares.
+    """
+    a = np.array([word_to_int(w) for w in arr1])
+    b = np.array([word_to_int(w) for w in arr2])
+
+    products = a * b
+    sqrt = np.sqrt(products)
+    return np.isclose(sqrt, np.round(sqrt))
+
+
 
 if __name__ =='__main__':
+    # if you convert the text into a numpy array from the rip, I bet alot of 
+    # this stuff goes way faster... 
+    
     # Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
     Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
     text = GetText(Book)
@@ -160,8 +200,8 @@ if __name__ =='__main__':
         print(sent)
     # quotes are defined by special charcters in this text
     quoted_inds, quoted_texts = GetBoundText(text, 
-                                            open_=special_chars[-5], 
-                                            close_ =special_chars[-4])
+                                            open_ = special_chars[-5], 
+                                            close_ = special_chars[-4])
     for qtext in quoted_texts[100:150]:
         print('...')
         print(qtext)
@@ -170,6 +210,7 @@ if __name__ =='__main__':
     DoubleCapped_starts, DoubleCapped_ends, DoubleCapped_ = GetDoubleCaps(text)
     print(sorted(list(set(DoubleCapped_))))
 
+    ###### ------ new seciton 
     # Get the individual words 
     DC_2 = []    
     for dc in DoubleCapped_:
@@ -181,22 +222,103 @@ if __name__ =='__main__':
     
 
     # filter this so you dont get an unmanageable amount of word pairs
-    thresh = 20
+    thresh = 15
     common = ['Project','Gutenberg', 'The', 'But', 'And']
+    DC_2_counts['Marmeladov']+=20 # I know marmeladov is a character in here
     top_DC_2 = {k:v for k,v in DC_2_counts.items() if v>thresh and not any([k== c for c in common])}  
     sorted_items_descending = sorted(top_DC_2.items(), key=lambda item: item[1], reverse=True)
     print(sorted_items_descending)
     
-    # get word pairs 
-    npDC_2 = np.array(list(top_DC_2.keys()))
+    # get word pairs -- numpy to make this go faster..... 
+    # OH you could have hashed all the words to make it go faster. maybe 
+    npDC_2 = np.array(list(top_DC_2.keys())) # source nodes
     # print(npDC_2)
     n = len(npDC_2)
     i, j = np.meshgrid(np.arange(n), np.arange(n), indexing="ij")
     mask = i<j
-    pairs = np.column_stack((npDC_2[i[mask]], npDC_2[j[mask]]))
+    pairs = np.column_stack((npDC_2[i[mask]], npDC_2[j[mask]])) # branches
+    pairs_counts = np.zeros((pairs.shape[0],))
     print(pairs.shape, n)
-    print(pairs[0:-1])
+    print(pairs[0:10])
+    print(npDC_2)
 
     # now after gettting a filtered list of word pairs, I want to get 
-    # hits for when these 2 words occur in a given window. 
+    # hits for when these 2 words occur in a given window. so like check sentence 500
+    
+    sents_ = np.array(sentences)
+    running_char_set = []
+    for sents_ in sentences:
+        print(sents_)
+        # print(sents_.shape)
+        
+        # so the next thing thats going to happen is you're going to 
+        # search through all the sentences... If say the first word
+        # in the word pair isnt in there, then you can skip over the entire branch man. 
+        # ok..... hm. So you if you itterate over npDC_2 thats the source node
+        # you can make sub sets out of the pairs..... 
+        clean_sent = CleanSpecialChars(sents_, ).split() # make sure this ends up as a list
+        print('clean sentence', clean_sent)
+        
+        # you want this to hash every element in a list of words 
+        clean_sent_word_hash = word_to_int(clean_sent)
+        print('sentence word hash :', clean_sent_word_hash)
+        for node in npDC_2:
+            # so what you do is itterate through the source nodes
+            # check it if is in the sentence
+            if node in clean_sent:
+                mask = node == pairs[:,0]
+                sub_nodes = pairs[mask]
+                sub_nodes_inds = np.where(mask)[0]
+                print(node, sub_nodes)
+                
+                # Now you want a way to go through the second column and see what word is there
+                # if they were numbers I'd multiply and look for perfect squares. 
+                sub_nodes_hash = word_to_int(list(sub_nodes[:,1]))
+                print(sub_nodes_hash)
+
+                # use int 64
+                opp = np.array(sub_nodes_hash, dtype=np.int64)[...,np.newaxis] * np.array(clean_sent_word_hash, dtype=np.int64)[np.newaxis,...]
+                sqrt_opp = np.floor(np.sqrt(opp)).astype(np.int64)
+                condition50 = sqrt_opp*sqrt_opp == opp
+                sub_node_idx = np.where(condition50)[0]
+                # check for perfect quare
+                print(condition50)
+                print(sub_node_idx)
+                
+                # Map back into global indices
+                global_idx = sub_nodes_inds[sub_node_idx]
+
+                # Increment counts
+                pairs_counts[global_idx] += 1
+                # if you save the data frames over time..... then you get a full object that tells you how the relationships evolve over time.
+                running_char_set.append(0+pairs_counts[...,np.newaxis])
+
+    print("pair_counts :", pairs_counts)
+    full_pairs_data= np.concatenate([pairs, pairs_counts[...,np.newaxis]], axis= -1)
+    print(full_pairs_data)
+    pd_full_pairs_data = pd.DataFrame(full_pairs_data, columns = ['x0','x1', 'counts'])
+    pd_full_pairs_data['counts'] = pd_full_pairs_data['counts'].astype(float)
+    pd_full_pairs_data = pd_full_pairs_data.sort_values(by="counts", ascending=False)           
+    pd_full_pairs_data.to_csv('pair counts.csv')
+
+    running_char_set = np.concatenate(running_char_set, axis = -1)
+    # get a top relationship 
+    rcs_index = np.where(pairs[:,0]+pairs[:,1] == 'RaskolnikovPorfiry')[0][0]
+    rcs_index2 =np.where(pairs[:,0]+pairs[:,1] == 'SoniaRaskolnikov')[0][0]
+    print('rcs index : ', rcs_index)
+
+    
+    fig, axes = plt.subplots(2, 1, figsize=(8, 6))
+
+    axes[0].plot(running_char_set[rcs_index, :], label = 'RaskolnikovPorfiry')
+    axes[0].plot(running_char_set[rcs_index2, :], label = 'SoniaRaskolnikov')
+    axes[0].set_ylabel('number of interactions')
+    axes[0].set_xlabel('sentence number')
+    axes[0].legend()
+
+    axes[1].plot(np.diff(running_char_set[rcs_index, :]), label = 'RaskolnikovPorfiry')
+    axes[1].plot(np.diff(running_char_set[rcs_index2, :]), label = 'SoniaRaskolnikov')
+    axes[1].legend()
+    
+    plt.savefig('relationships.png')
     
