@@ -30,7 +30,15 @@ comes out like once. Hes a drunk and gets hit by a horse cart, dies, and thats
 what pushes his family further into poverty, and pushes raskolnikov and sonia(?)
 together. Its one of the catalysts for Raskolnikov turning himself in. 
 
+
+Make a JSON file for pair counts, and include the sentence index where the pairs happen.  so like 
+name, name, list of inds.... 
+
+Need to think of getting words that are within a window of sentences. because Raskolnikov and Dmitri never show together
+
 '''
+
+
 def GetText(x):
     with open(x, "r" ) as f:
         return f.read()
@@ -244,13 +252,12 @@ if __name__ =='__main__':
 
     # now after gettting a filtered list of word pairs, I want to get 
     # hits for when these 2 words occur in a given window. so like check sentence 500
-    
-    sents_ = np.array(sentences)
+    print('----- new section')
     running_char_set = []
-    for sents_ in sentences:
-        print(sents_)
-        # print(sents_.shape)
-        
+    sentence_window = 10
+    for sii in range(0,len(sentences)-sentence_window, sentence_window):
+        sents_ = ' '.join(sentences[sii: sii + sentence_window])
+        print(sents_)    
         # so the next thing thats going to happen is you're going to 
         # search through all the sentences... If say the first word
         # in the word pair isnt in there, then you can skip over the entire branch man. 
@@ -258,7 +265,7 @@ if __name__ =='__main__':
         # you can make sub sets out of the pairs..... 
         clean_sent = CleanSpecialChars(sents_, ).split() # make sure this ends up as a list
         print('clean sentence', clean_sent)
-        
+
         # you want this to hash every element in a list of words 
         clean_sent_word_hash = word_to_int(clean_sent)
         print('sentence word hash :', clean_sent_word_hash)
@@ -289,7 +296,7 @@ if __name__ =='__main__':
                 global_idx = sub_nodes_inds[sub_node_idx]
 
                 # Increment counts
-                pairs_counts[global_idx] += 1
+                pairs_counts[global_idx] += 1 / sentence_window
                 # if you save the data frames over time..... then you get a full object that tells you how the relationships evolve over time.
                 running_char_set.append(0+pairs_counts[...,np.newaxis])
 
@@ -299,7 +306,7 @@ if __name__ =='__main__':
     pd_full_pairs_data = pd.DataFrame(full_pairs_data, columns = ['x0','x1', 'counts'])
     pd_full_pairs_data['counts'] = pd_full_pairs_data['counts'].astype(float)
     pd_full_pairs_data = pd_full_pairs_data.sort_values(by="counts", ascending=False)           
-    pd_full_pairs_data.to_csv('pair counts.csv')
+    pd_full_pairs_data.to_csv(f'pair counts {sentence_window} sentence.csv')
 
     running_char_set = np.concatenate(running_char_set, axis = -1)
     # get a top relationship 
@@ -320,5 +327,5 @@ if __name__ =='__main__':
     axes[1].plot(np.diff(running_char_set[rcs_index2, :]), label = 'SoniaRaskolnikov')
     axes[1].legend()
     
-    plt.savefig('relationships.png')
+    plt.savefig(f'relationships_{sentence_window}sentence.png')
     
