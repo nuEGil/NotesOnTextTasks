@@ -1,5 +1,6 @@
 import os 
 import re
+import numpy as np 
 '''Need to merge this with FeatureCrafting at some point. 
 get words per sentence 
 get sentence per paragraph
@@ -121,7 +122,18 @@ def GetWordsAndInds(text, special_chars = '.'):
             uwords_and_locs.append([filtered_word,wi])
     return uwords_and_locs, total_n_words
 
+def GetWordCounts(X):
+    X_counts = {}
+    for x in X:
+        if not x in X_counts.keys():
+            X_counts[x] = 1
+        else:
+            X_counts[x]+=1
+    return X_counts
+
+
 if __name__ =='__main__':
+    # Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
     Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
     text = GetText(Book)
     
@@ -155,11 +167,36 @@ if __name__ =='__main__':
         print(qtext)
 
     # get names of characters and what not. might hard code these. 
-    name_starts, name_ends, names_ = GetDoubleCaps(text)
-    print(sorted(list(set(names_))))
+    DoubleCapped_starts, DoubleCapped_ends, DoubleCapped_ = GetDoubleCaps(text)
+    print(sorted(list(set(DoubleCapped_))))
 
-    # separators = [' ', '-', '--','...']
-    # empahsis = ['_']
-    # terminators = '!?'
+    # Get the individual words 
+    DC_2 = []    
+    for dc in DoubleCapped_:
+        DC_2.extend(dc.split())
+    
+    DC_2_counts = GetWordCounts(DC_2)  
+    sorted_items_descending = sorted(DC_2_counts.items(), key=lambda item: item[1], reverse=True)
+    print(sorted_items_descending)
+    
 
+    # filter this so you dont get an unmanageable amount of word pairs
+    thresh = 20
+    common = ['Project','Gutenberg', 'The', 'But', 'And']
+    top_DC_2 = {k:v for k,v in DC_2_counts.items() if v>thresh and not any([k== c for c in common])}  
+    sorted_items_descending = sorted(top_DC_2.items(), key=lambda item: item[1], reverse=True)
+    print(sorted_items_descending)
+    
+    # get word pairs 
+    npDC_2 = np.array(list(top_DC_2.keys()))
+    # print(npDC_2)
+    n = len(npDC_2)
+    i, j = np.meshgrid(np.arange(n), np.arange(n), indexing="ij")
+    mask = i<j
+    pairs = np.column_stack((npDC_2[i[mask]], npDC_2[j[mask]]))
+    print(pairs.shape, n)
+    print(pairs[0:-1])
+
+    # now after gettting a filtered list of word pairs, I want to get 
+    # hits for when these 2 words occur in a given window. 
     
