@@ -1,3 +1,18 @@
+# Text features and knowldege graph construction 
+Need to look into neo4j -- graph RAG tool for AI models. So this tool is inspired by that and this YouTube video https://www.youtube.com/watch?v=j2T4gvQAiaE&t=567s where the creator uses a graph based approach to studying friendships between characters in top mangas. Find words (people, proteins, genes) that occur in the same episode (window of text). This is relavent for LLMs because as users pass inputs to the model their context windows fill up. Graph based approaches are just one class that can be used to create data structures that might reduce the amount of information you need to pass to the context window to get good results. -- SO I figure I need to build some text processing tools that are not totally AI. Maybe part of the context over load leads to positive reinforcement cycles that are bad for people's health. 
+
+Existing tools : neo4j, Letta, Anthropic Claude Memory management.  
+https://www.letta.com/
+
+1. FeatureCrafting.py -- initial pass at extracting nouns, sentences, words, etc. 
+2. TapeReader.py -- Secondary pass that uses regex patterns to pull paragraphs, sentences, gets nouns, but has some hard filtereing steps to reduce the number of word pairs used for the graph construction. Checks for the occurence of word pairs in windows of words (n sentences). Currently gets end count of word pairs -- going to expand to get indices of increment for the word pairs -- then save the whole thing to a JSON. So you have word1, word2, list of indices. --> from there we can do text classifiers to look for more interesting relationships. 
+3. Graph_making.py -- use pyvis to make an html graph of the csv file dumped from TapeReader.py.
+
+Next step for this --> make a google collab to demonstrate functions 
+Train a Text Classifier for finding more interesting + abstract relationships.
+Make a GUI to bundle it all up -- Kivy here we come.  
+
+
 # Simple text generation tutorials 
 these scripts are for when we want to train something from scratch using pytorch and tensorflow. Modify layers, modify inputs. custom as much as we can -- while making use of torch layers and keras layers as much as possible
 
