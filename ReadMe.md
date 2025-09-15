@@ -1,4 +1,6 @@
 # Repository map
+This gives a description of the directories for each part of the project. 
+
 ## RAGTextApp
 Making the parts for a text application that uses Retrieval Augmented Generation. Focusing in on the retreival part, and data object generation part though. 
 

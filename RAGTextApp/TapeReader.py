@@ -111,6 +111,19 @@ def GetSentences(text, offset = 0):
 
     return sentence_starts, sentence_ends, sentences
 
+def GetSentencesFromParagraphs(paragraphs, paragraph_inds):
+    # Get all the sentences in paragraphs
+    sentence_starts = []
+    sentence_ends = []
+    sentences = []
+    for para, pis in zip(paragraphs, paragraph_inds):
+        a,b,c = GetSentences(para, offset = pis)
+        sentence_starts.extend(a)
+        sentence_ends.extend(b)
+        sentences.extend(c)
+
+    return sentence_starts, sentence_ends, sentences 
+
 def GetDoubleCaps(text):
     text = text.replace('\n', ' ')
     # trying to find names here
@@ -154,6 +167,47 @@ def GetWordCounts(X):
             X_counts[x]+=1
     return X_counts
 
+def GetLikelyPlayers(DoubleCapped_):
+    # Get the individual words 
+    DC_2 = []    
+    for dc in DoubleCapped_:
+        DC_2.extend(dc.split())
+    
+    DC_2_counts = GetWordCounts(DC_2)  
+    sorted_items_descending = sorted(DC_2_counts.items(), key=lambda item: item[1], reverse=True)
+    # print(sorted_items_descending)
+    
+    # filter this so you dont get an unmanageable amount of word pairs
+    thresh = 15
+    common = ['Project','Gutenberg', 'The', 'But', 'And']
+    DC_2_counts['Marmeladov']+=20 # I know marmeladov is a character in here
+    top_DC_2 = {k:v for k,v in DC_2_counts.items() if v>thresh and not any([k== c for c in common])}  
+    
+    # then this part is just for printing
+    sorted_items_descending = sorted(top_DC_2.items(), key=lambda item: item[1], reverse=True)
+    print(sorted_items_descending)
+    
+    # getting back a dictionary of the top players + their counts
+    return top_DC_2
+
+def GetImportantPairs(LikelyPlayers):
+    # take all the players from the dict and make pairs     
+    npDC_2 = np.array(list(LikelyPlayers.keys())) # source nodes
+
+    # number of players
+    n = len(npDC_2)
+
+    # Pairing players makes a square matrix - O(N^2) scaling so filter likely players
+    i, j = np.meshgrid(np.arange(n), np.arange(n), indexing="ij")
+    mask0 = i<j
+    pairs = np.column_stack((npDC_2[i[mask0]], npDC_2[j[mask0]])) # branches
+    pairs_counts = np.zeros((pairs.shape[0],))
+    print(pairs.shape, n)
+    print(pairs[0:10])
+    print(npDC_2)
+    # return the resulting player list, and the pairs
+    return npDC_2, pairs, pairs_counts
+
 def CleanSpecialChars(text: str) -> str:
     text = re.sub(r'[^A-Za-z0-9\s]', ' ', text)
     return re.sub(r'\s+', ' ', text).strip()
@@ -175,86 +229,9 @@ def perfect_square_matches(arr1, arr2):
     sqrt = np.sqrt(products)
     return np.isclose(sqrt, np.round(sqrt))
 
-
-
-if __name__ =='__main__':
-    # if you convert the text into a numpy array from the rip, I bet alot of 
-    # this stuff goes way faster... 
-    
-    # Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
-    Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
-    text = GetText(Book)
-    
-    chars, special_chars = GetCharacters(text)
-    print(list(special_chars))
-    # print(list(text[0:10000]))
-
-    # get all the paragraphs
-    paragraph_inds, paragraphs = GetParagraphs(text)
-
-    print(paragraphs[43].replace('\n', ' '))
-
-    # Get all the sentences
-    sentence_starts = []
-    sentence_ends = []
-    sentences = []
-    for para, pis in zip(paragraphs, paragraph_inds):
-        a,b,c = GetSentences(para, offset = pis)
-        sentence_starts.extend(a)
-        sentence_ends.extend(b)
-        sentences.extend(c)
-    for sent in sentences[100:150]:
-        print('---')
-        print(sent)
-    # quotes are defined by special charcters in this text
-    quoted_inds, quoted_texts = GetBoundText(text, 
-                                            open_ = special_chars[-5], 
-                                            close_ = special_chars[-4])
-    for qtext in quoted_texts[100:150]:
-        print('...')
-        print(qtext)
-
-    # get names of characters and what not. might hard code these. 
-    DoubleCapped_starts, DoubleCapped_ends, DoubleCapped_ = GetDoubleCaps(text)
-    print(sorted(list(set(DoubleCapped_))))
-
-    ###### ------ new seciton 
-    # Get the individual words 
-    DC_2 = []    
-    for dc in DoubleCapped_:
-        DC_2.extend(dc.split())
-    
-    DC_2_counts = GetWordCounts(DC_2)  
-    sorted_items_descending = sorted(DC_2_counts.items(), key=lambda item: item[1], reverse=True)
-    print(sorted_items_descending)
-    
-
-    # filter this so you dont get an unmanageable amount of word pairs
-    thresh = 15
-    common = ['Project','Gutenberg', 'The', 'But', 'And']
-    DC_2_counts['Marmeladov']+=20 # I know marmeladov is a character in here
-    top_DC_2 = {k:v for k,v in DC_2_counts.items() if v>thresh and not any([k== c for c in common])}  
-    sorted_items_descending = sorted(top_DC_2.items(), key=lambda item: item[1], reverse=True)
-    print(sorted_items_descending)
-    
-    # get word pairs -- numpy to make this go faster..... 
-    # OH you could have hashed all the words to make it go faster. maybe 
-    npDC_2 = np.array(list(top_DC_2.keys())) # source nodes
-    # print(npDC_2)
-    n = len(npDC_2)
-    i, j = np.meshgrid(np.arange(n), np.arange(n), indexing="ij")
-    mask = i<j
-    pairs = np.column_stack((npDC_2[i[mask]], npDC_2[j[mask]])) # branches
-    pairs_counts = np.zeros((pairs.shape[0],))
-    print(pairs.shape, n)
-    print(pairs[0:10])
-    print(npDC_2)
-
-    # now after gettting a filtered list of word pairs, I want to get 
-    # hits for when these 2 words occur in a given window. so like check sentence 500
-    print('----- new section')
+def DoSomething(node_list, pairs, sentences, sentence_window = 10):
     running_char_set = []
-    sentence_window = 10
+    
     for sii in range(0,len(sentences)-sentence_window, sentence_window):
         sents_ = ' '.join(sentences[sii: sii + sentence_window])
         print(sents_)    
@@ -266,10 +243,10 @@ if __name__ =='__main__':
         clean_sent = CleanSpecialChars(sents_, ).split() # make sure this ends up as a list
         print('clean sentence', clean_sent)
 
-        # you want this to hash every element in a list of words 
+        # Check to see if the nodes from the node list occur together in pairs within the sentence window
         clean_sent_word_hash = word_to_int(clean_sent)
         print('sentence word hash :', clean_sent_word_hash)
-        for node in npDC_2:
+        for node in node_list:
             # so what you do is itterate through the source nodes
             # check it if is in the sentence
             if node in clean_sent:
@@ -308,13 +285,15 @@ if __name__ =='__main__':
     pd_full_pairs_data = pd_full_pairs_data.sort_values(by="counts", ascending=False)           
     pd_full_pairs_data.to_csv(f'pair counts {sentence_window} sentence.csv')
 
+    # concatenate for now
     running_char_set = np.concatenate(running_char_set, axis = -1)
+
     # get a top relationship 
     rcs_index = np.where(pairs[:,0]+pairs[:,1] == 'RaskolnikovPorfiry')[0][0]
     rcs_index2 =np.where(pairs[:,0]+pairs[:,1] == 'SoniaRaskolnikov')[0][0]
     print('rcs index : ', rcs_index)
 
-    
+    # this could be a function too. 
     fig, axes = plt.subplots(2, 1, figsize=(8, 6))
 
     axes[0].plot(running_char_set[rcs_index, :], label = 'RaskolnikovPorfiry')
@@ -328,4 +307,58 @@ if __name__ =='__main__':
     axes[1].legend()
     
     plt.savefig(f'relationships_{sentence_window}sentence.png')
+
+    return running_char_set, pd_full_pairs_data
+
+
+if __name__ =='__main__':
+    # Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
+    Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
+    text = GetText(Book)
+    
+    chars, special_chars = GetCharacters(text)
+    print(list(special_chars))
+    # print(list(text[0:10000]))
+
+    # get all the paragraphs
+    paragraph_inds, paragraphs = GetParagraphs(text)
+
+    print(paragraphs[43].replace('\n', ' '))
+
+    # get every sentence in every paragrph
+    # the get sentences funciton will operate directly on the text, but at least this way we 
+    # can link paragraphs to sentences
+    sentence_starts, sentence_ends, sentences = GetSentencesFromParagraphs(paragraphs, paragraph_inds)
+
+    for sent in sentences[100:150]:
+        print('---')
+        print(sent)
+
+    # quotes are defined by special charcters in this text
+    quoted_inds, quoted_texts = GetBoundText(text, 
+                                            open_ = special_chars[-5], 
+                                            close_ = special_chars[-4])
+    for qtext in quoted_texts[100:150]:
+        print('...')
+        print(qtext)
+    
+    # get names of characters and what not. might hard code these. 
+    DoubleCapped_starts, DoubleCapped_ends, DoubleCapped_ = GetDoubleCaps(text)
+    print(sorted(list(set(DoubleCapped_))))
+
+    # ------ new seciton 
+    LikelyPlayers = GetLikelyPlayers(DoubleCapped_)
+    
+    # Get important pairs
+    node_list, pairs, pairs_counts = GetImportantPairs(LikelyPlayers)
+    
+    # now after gettting a filtered list of word pairs, I want to get 
+    # hits for when these 2 words occur in a given window. so like check sentence 500
+    print('----- new section')
+    
+    # this thing 
+    running_char_set, pd_full_pairs_data = DoSomething(node_list, pairs, sentences, sentence_window = 10)
+    
+    
+   
     
