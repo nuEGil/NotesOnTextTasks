@@ -37,16 +37,15 @@ Multi-genre Natural language inference (MNLI)
 Trained on masked language modeling objective. 
 
 ## GoogleColabs
-
-1. Experimenting with Hugging Face.ipynb 
-ok this exmample loads up BERT Turns out any google account has access to google collab which comes with huging face transformers preinstalled
-So build your apps there. 
-
-2. CardiacSignalsStuff.ipynb
+1. CardiacSignalsStuff.ipynb
 This example uses the MIT-BIH arrhymia data set (copy on physionet) which contains ECG signals from multiple views along with data like patient age, sex, and medication lists. The data was taken in the 80s and digitized. In this example we load some of the data with the wfdb library, show the frequency spectrum and filter the signal. I also wrote a simple algorithm to extract the R-R intervals. I generate prompts given the patient meta data and the R-R intervals, and pass those prompts to gpt2 using the huggingface hosted gpt2 model. There's some interesting results here. The model definitely needs some finetuning, but it is a cool way to test out something of a full pipeline that involves: signal loading, cleaning, windowing, phyisological feature extraction, followed by prompting for text generation. The options here would be to fine tune gpt2 or to put some more work into the SimpleTextGen_tensorflow.py model. But for now this is enough. 
 
-3. Building Knowledge Graphs.ipynb -- 
+2. Designing Text Retrieval Functions.ipynb -- this uses regular expresions to get paragraphs, sentences, and quotes from the text. Then looks for double caps words to and has a filter right after to get first name + last names of some characters. Theres a section on building pairs and finding those pairs within sentence windows. Plots a directed word graph, the sentence number that word pairs occur within the text, and a plot on the introduction of new words in general.  
 
+3. Building Knowledge Graphs.ipynb - consider ommitting this. 
+
+
+4. Experimenting with Hugging Face.ipynb -- first pass at parsing text with hugging face models. 
 
 ## TransformerTurorials
 1. AndrejKarpathy_SimpleTextGen_pytorch.py
