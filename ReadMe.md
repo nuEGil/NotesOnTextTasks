@@ -40,21 +40,21 @@ Trained on masked language modeling objective.
 
 ```mermaid
 graph TD;
-    A[Training Scripts<br/>TF or Torch<br/>]-->B[Container<br/>docker or kubernetes];
-    B-->C[Artifact Registry];
+    A[Training Scripts<br/>TF or Torch<br/>]-->B[Container<br/>];
+    B-->C[**Artifact Registry**];
     D[Custom Prediction Scripts<br/>Model server<br/>]-->C;
-    C-->E[Vertex AI];
+    C-->E[**Vertex AI**];
     F[Training Jobs]-->E;
     G[Prediction Jobs]-->E;
     E-->H[Model Params] & I[Model Logs] & J[Prediction Artifacts];
-    H & I & J -->K[Storage Bucket];
+    H & I & J -->K[**Storage Bucket**];
     L[Front End Web App]-->M[Container];
-    M-->N[Cloud Run];
+    M-->N[**Cloud Run**];
     N-->O[HTTP Requests];
     O-->E;
     K-->L;
     P[User]-->L;
-    Q[Dev with Google CLI]-->F & G;
+    Q[Dev<br/>**Google CLI**]-->F & G & A & D;
 
 
     
