@@ -40,7 +40,7 @@ Trained on masked language modeling objective.
 
 ```mermaid
 graph TD;
-    A[Training Scripts <br/>TF or Torch]-->B;
+    A[Training Scripts <br/>TF or Torch<br/>--data=gs://path/to/.csv<br/>--model_dir=gs://path/to/modeldir]-->B[container<br/docker or kubernetes>];
     A-->C;
     B-->D;
     C-->D;
