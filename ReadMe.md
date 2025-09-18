@@ -57,7 +57,7 @@ graph TD;
     H & I & J --> K[**Storage Buckets**]
 
     %% Frontend + Cloud Run
-    L[Front End Web App<br/>Container<br/hosted on firebase>] --> N[**Cloud Run**]
+    L[Front End Web App<br/>Container<br/>hosted on firebase] --> N[**Cloud Run**]
     N --> O[HTTP Requests];
     E-->Z[HTTP Reponse];
     Z-->N;
