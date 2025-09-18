@@ -48,7 +48,12 @@ graph TD;
     G[Prediction Jobs]-->E;
     E-->H[Model Params] & I[Model Logs] & J[Prediction Artifacts];
     H & I & J -->K[Storage Bucket];
+    L[Front End Web App]-->M[Container];
+    M-->N[Cloud Run];
+    N-->O[HTTP Requests];
+    O-->E;
     
+
     
 
     
