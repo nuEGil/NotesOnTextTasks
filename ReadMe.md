@@ -58,10 +58,14 @@ graph TD;
 
     %% Frontend + Cloud Run
     L[Front End Web App<br/>container] --> N[**Cloud Run**]
-    N --> O[HTTP Requests]
-    O --> E
-    K --> L
-    P[User] --> L
+    N --> O[HTTP Requests];
+    E-->Z[HTTP Reponse];
+    Z-->N;
+    N-->K;
+    O --> E;
+    K --> L;
+    P[User] --> N;
+    N-->P;
 
     %% Dev tools
     Q[Dev<br/>**Google CLI**] --> F & G & A & D
