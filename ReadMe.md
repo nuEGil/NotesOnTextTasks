@@ -40,9 +40,13 @@ Trained on masked language modeling objective.
 
 ```mermaid
 graph TD;
-    A[Training Scripts<br/>TF or Torch<br/>--data=gs://.../data.csv<br/>--model_dir=gs://path/to/modeldir]-->B[container<br/>docker or kubernetes>];
+    A[Training Scripts<br/>TF or Torch<br/>]-->B[Container<br/>docker or kubernetes];
     B-->C[Artifact Registry];
-    D[Custom Prediction Scripts<br/>Model server<br/>Example:FastAPI+U-Net server]-->C;
+    D[Custom Prediction Scripts<br/>Model server<br/> ]-->C;
+    C-->E[Vertex AI];
+    F[Training Jobs]-->E;
+    G[Prediction Jobs]--E;
+    
     
 ```
 
