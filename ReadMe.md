@@ -57,7 +57,7 @@ graph TD;
     H & I & J --> K[**Storage Buckets**]
 
     %% Frontend + Cloud Run
-    L[Front End Web App<br/>container] --> N[**Cloud Run**]
+    L[Front End Web App<br/>Container] --> N[**Cloud Run**]
     N --> O[HTTP Requests];
     E-->Z[HTTP Reponse];
     Z-->N;
@@ -79,6 +79,7 @@ graph TD;
     %% Apply classes
 
     class C,E,K,Q,N blueText;
+    class A,D,L greenText;
 
 ```
 
