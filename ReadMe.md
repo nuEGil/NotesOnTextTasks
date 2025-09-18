@@ -67,7 +67,15 @@ graph TD;
     Q[Dev<br/>**Google CLI**] --> F & G & A & D
     L --> K
 
-    
+    %% Define classes
+    classDef yellowText color:#e69138,fill:#fff,stroke:#333,stroke-width:1px;
+    classDef greenText color:#38761d,fill:#fff,stroke:#333,stroke-width:1px;
+    classDef blueText color:#1155cc,fill:#fff,stroke:#333,stroke-width:1px;
+
+    %% Apply classes
+    class A yellowText;
+    class B greenText;
+    class C blueText;
 
 ```
 
