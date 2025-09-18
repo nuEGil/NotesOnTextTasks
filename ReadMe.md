@@ -39,12 +39,12 @@ Trained on masked language modeling objective.
 # Full AI Service Loop on GCP
 
 ```mermaid
-graph TB
-    A[Vertex AI Training<br>(PyTorch Container)<br>--data=gs://...<br>--model_dir=gs://...] --> B[Cloud Storage (Model Artifacts)]
-    B --> C[Cloud Run FastAPI<br>(Prediction Service)<br>Loads model from GCS<br>Outputs to GCS]
-    C --> D[Cloud Storage (Input/Output Data)]
-    D --> E[React Frontend<br>(Containerized / Firebase)<br>Sends requests, shows results]
-
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
 
 ## GoogleColabs
 1. CardiacSignalsStuff.ipynb
