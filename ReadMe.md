@@ -1,16 +1,15 @@
 # Repository map
 This gives a description of the directories for each part of the project. 
 
-## RAGTextApp
-Making the parts for a text application that uses Retrieval Augmented Generation. Focusing in on the retreival part, and data object generation part though. 
-
-### TODO 
-1. Make a google collab to demonstrate retrival functions from TapeReader.py
+## TODO 
+1. Continue experimenting with web apps --UI/UX
 2. Use Wikipedia API to get a list of common words, a dictionary, and some articles 
 3. Create a heirarchical text dataset from task 2. 
 4. Train a text classifier for the heirarchical relationships
 5. Make a text embedding + look up table. No need for the final layer of a word model to have N words output shape. consider binary,or an embedding structure to have less outputs but still represent all words. 
-5. Make a better GUI to bundle it all up 
+
+## RAGTextApp
+Making the parts for a text application that uses Retrieval Augmented Generation. Focusing in on the retreival part, and data object generation part though. 
 
 ### Scripts
 1. FeatureCrafting.py -- initial pass at extracting nouns, sentences, words, etc. 
@@ -35,6 +34,15 @@ For example https://huggingface.co/FacebookAI/roberta-large-mnli
 this one is a text classificaiton model -- built on BERT -- bidirectional encoder representations from transformers
 Multi-genre Natural language inference (MNLI)
 Trained on masked language modeling objective. 
+
+## System Design note for cloud 
+```mermaid
+flowchart TD
+    A[Vertex AI Training\n(PyTorch Container)\n--data=gs://...\n--model_dir=gs://...] --> B[Cloud Storage (Model Artifacts)]
+    B --> C[Cloud Run FastAPI\n(Prediction Service)\nLoads model from GCS\nOutputs to GCS]
+    C --> D[Cloud Storage (Input/Output Data)]
+    D --> E[React Frontend\n(Containerized / Firebase)\nSends requests, shows results]
+
 
 ## GoogleColabs
 1. CardiacSignalsStuff.ipynb
