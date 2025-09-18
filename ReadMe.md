@@ -2,8 +2,8 @@
 This gives a description of the directories for each part of the project. 
 
 ## TODO 
-1. Continue experimenting with web apps --UI/UX
-2. Use Wikipedia API to get a list of common words, a dictionary, and some articles 
+1. Make more web apps -- UI/UX --> host on github pages -- should be able to do static only with animations + project descriptions
+2. Use Wikipedia REST API to get pages. Need to make a parser to get Word freqeuncy lists + dictionary pages from Wiktionary --> wikipedia has the REST API, Witkionary returns HTML pages. 
 3. Create a heirarchical text dataset from task 2. 
 4. Train a text classifier for the heirarchical relationships
 5. Make a text embedding + look up table. No need for the final layer of a word model to have N words output shape. consider binary,or an embedding structure to have less outputs but still represent all words. 
