@@ -47,7 +47,7 @@ graph TD;
     F[Training Jobs]-->E;
     G[Prediction Jobs]-->E;
     E-->H[Model Params] & I[Model Logs] & J[Prediction Artifacts];
-    H & I & J -->K[**Storage Bucket**];
+    H & I & J -->K[**Storage Buckets**];
     L[Front End Web App]-->M[Container];
     M-->N[**Cloud Run**];
     N-->O[HTTP Requests];
@@ -55,7 +55,7 @@ graph TD;
     K-->L;
     P[User]-->L;
     Q[Dev<br/>**Google CLI**]-->F & G & A & D;
-
+    L-->K;
 
     
 
