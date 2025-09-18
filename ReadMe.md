@@ -69,12 +69,7 @@ graph TD;
     Q[Dev<br/>**Google CLI**] --> F & G & A & D
     L --> K
 
-    %% --- Styles ---
-    style C fill:#ffe599,stroke:#333,stroke-width:2px
-    style E fill:#b6d7a8,stroke:#333,stroke-width:2px
-    style K fill:#d9d9d9,stroke:#333,stroke-width:2px
-    style N fill:#cfe2f3,stroke:#333,stroke-width:2px
-    style Q fill:#f4cccc,stroke:#333,stroke-width:2px
+    
 
 ```
 
