@@ -40,26 +40,42 @@ Trained on masked language modeling objective.
 
 ```mermaid
 graph TD;
-    A[Training Scripts<br/>TF or Torch<br/>]-->B[Container<br/>];
-    B-->C[**Artifact Registry**];
-    D[Custom Prediction Scripts<br/>Model server<br/>]-->C;
-    C-->E[**Vertex AI**];
-    F[Training Jobs]-->E;
-    G[Prediction Jobs]-->E;
-    E-->H[Model Params] & I[Model Logs] & J[Prediction Artifacts];
-    H & I & J -->K[**Storage Buckets**];
-    L[Front End Web App]-->M[Container];
-    M-->N[**Cloud Run**];
-    N-->O[HTTP Requests];
-    O-->E;
-    K-->L;
-    P[User]-->L;
-    Q[Dev<br/>**Google CLI**]-->F & G & A & D;
-    L-->K;
 
-    
+    %% Training + Containers
+    A[Training Scripts<br/>TF or Torch] --> B[Container]
+    B --> C[**Artifact Registry**]
 
-    
+    %% Prediction scripts to Artifact Registry
+    D[Custom Prediction Scripts<br/>Model server] --> C
+
+    %% Vertex AI jobs
+    C --> E[**Vertex AI**]
+    F[Training Jobs] --> E
+    G[Prediction Jobs] --> E
+
+    %% Model outputs
+    E --> H[Model Params] & I[Model Logs] & J[Prediction Artifacts]
+    H & I & J --> K[**Storage Buckets**]
+
+    %% Frontend + Cloud Run
+    L[Front End Web App] --> M[Container]
+    M --> N[**Cloud Run**]
+    N --> O[HTTP Requests]
+    O --> E
+    K --> L
+    P[User] --> L
+
+    %% Dev tools
+    Q[Dev<br/>**Google CLI**] --> F & G & A & D
+    L --> K
+
+    %% --- Styles ---
+    style C fill:#ffe599,stroke:#333,stroke-width:2px
+    style E fill:#b6d7a8,stroke:#333,stroke-width:2px
+    style K fill:#d9d9d9,stroke:#333,stroke-width:2px
+    style N fill:#cfe2f3,stroke:#333,stroke-width:2px
+    style Q fill:#f4cccc,stroke:#333,stroke-width:2px
+
 ```
 
 ## GoogleColabs
