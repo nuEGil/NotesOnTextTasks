@@ -38,10 +38,10 @@ Trained on masked language modeling objective.
 ## System Design note for cloud 
 ```mermaid
 flowchart TD
-    A[Vertex AI Training\n(PyTorch Container)\n--data=gs://...\n--model_dir=gs://...] --> B[Cloud Storage (Model Artifacts)]
-    B --> C[Cloud Run FastAPI\n(Prediction Service)\nLoads model from GCS\nOutputs to GCS]
+    A[Vertex AI Training<br/>(PyTorch Container)<br/>--data=gs://...<br/>--model_dir=gs://...] --> B[Cloud Storage (Model Artifacts)]
+    B --> C[Cloud Run FastAPI<br/>(Prediction Service)<br/>Loads model from GCS<br/>Outputs to GCS]
     C --> D[Cloud Storage (Input/Output Data)]
-    D --> E[React Frontend\n(Containerized / Firebase)\nSends requests, shows results]
+    D --> E[React Frontend<br/>(Containerized / Firebase)<br/>Sends requests, shows results]
 
 
 ## GoogleColabs
