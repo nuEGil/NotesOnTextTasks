@@ -73,9 +73,8 @@ graph TD;
     classDef blueText color:#1155cc,fill:#fff,stroke:#333,stroke-width:1px;
 
     %% Apply classes
-    class A yellowText;
-    class B greenText;
-    class C blueText;
+
+    class C,E,K,Q,N blueText;
 
 ```
 
