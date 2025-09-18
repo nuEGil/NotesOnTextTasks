@@ -46,7 +46,7 @@ graph TD;
     C-->E[Vertex AI];
     F[Training Jobs]-->E;
     G[Prediction Jobs]-->E;
-    E-->H[Model Params] & I[Model Logs] J[Prediction Artifacts];
+    E-->H[Model Params] & I[Model Logs] & J[Prediction Artifacts];
     
     
 
