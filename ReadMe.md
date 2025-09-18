@@ -35,9 +35,9 @@ this one is a text classificaiton model -- built on BERT -- bidirectional encode
 Multi-genre Natural language inference (MNLI)
 Trained on masked language modeling objective. 
 
-# System Design note for cloud 
+## System Design note for cloud 
 
-## Full AI Service Loop on GCP
+### Full AI Service Loop on GCP
 ```mermaid
 graph TD;
 
