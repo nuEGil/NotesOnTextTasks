@@ -42,8 +42,8 @@ Trained on masked language modeling objective.
 graph TD;
     A[Training Scripts<br/>TF or Torch<br/>--data=gs://.../data.csv<br/>--model_dir=gs://path/to/modeldir]-->B[container<br/>docker or kubernetes>];
     B-->C[Artifact Registry];
-    D[Custom Prediction Scripts<br/>Model server<br/>Example:FastAPI+U-Net server]-->E[VertexAI Endpoint];
-    C-->D;
+    D[Custom Prediction Scripts<br/>Model server<br/>Example:FastAPI+U-Net server]-->C;
+    
 ```
 
 ## GoogleColabs
