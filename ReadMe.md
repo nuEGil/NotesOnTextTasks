@@ -36,7 +36,7 @@ Multi-genre Natural language inference (MNLI)
 Trained on masked language modeling objective. 
 
 ## System Design note for cloud 
-
+Here's a graph showing all the parts that you would want to build out for a AI/ML web application. Might improve this later, or add a simpler graph for a local app or something. 
 ### Full AI Service Loop on GCP
 ```mermaid
 graph TD;
