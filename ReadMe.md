@@ -47,6 +47,7 @@ graph TD;
     F[Training Jobs]-->E;
     G[Prediction Jobs]-->E;
     E-->H[Model Params] & I[Model Logs] & J[Prediction Artifacts];
+    H & I & J -->K[Storage Bucket];
     
     
 
