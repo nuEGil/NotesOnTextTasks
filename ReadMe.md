@@ -42,7 +42,7 @@ Trained on masked language modeling objective.
 graph TD;
 
     %% Training + Containers
-    A[Training Scripts<br/>TF or Torch<br/Container>] --> C[**Artifact Registry**]
+    A[Training Scripts<br/>TF or Torch<br/>Container] --> C[**Artifact Registry**]
 
     %% Prediction scripts to Artifact Registry
     D[Custom Prediction Scripts<br/>Model server] --> C
@@ -50,7 +50,7 @@ graph TD;
     %% Vertex AI jobs
     C --> E[**Vertex AI**]
     F[Training Jobs] --> E
-    G[Prediction Jobs] --> E
+    G[Prediction Jobs<br/>via Endpoint etc.] --> E
 
     %% Model outputs
     E --> H[Model Params] & I[Model Logs] & J[Prediction Artifacts]
