@@ -40,7 +40,7 @@ Trained on masked language modeling objective.
 
 ```mermaid
 graph TD;
-    A[Training Scripts TF or Torch]-->B;
+    A[Training Scripts <br/>TF or Torch]-->B;
     A-->C;
     B-->D;
     C-->D;
