@@ -53,6 +53,8 @@ graph TD;
     N-->O[HTTP Requests];
     O-->E;
     K-->L;
+    P[User]-->L;
+    Q[Dev with Google CLI]-->F & G;
 
 
     
