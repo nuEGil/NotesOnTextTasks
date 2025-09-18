@@ -42,10 +42,13 @@ Trained on masked language modeling objective.
 graph TD;
     A[Training Scripts<br/>TF or Torch<br/>]-->B[Container<br/>docker or kubernetes];
     B-->C[Artifact Registry];
-    D[Custom Prediction Scripts<br/>Model server<br/> ]-->C;
+    D[Custom Prediction Scripts<br/>Model server<br/>]-->C;
     C-->E[Vertex AI];
     F[Training Jobs]-->E;
     G[Prediction Jobs]-->E;
+    E-->H[Model Params] & I[Model Logs] J[Prediction Artifacts];
+    
+    
 
     
 ```
