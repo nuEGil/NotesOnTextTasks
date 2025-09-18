@@ -36,20 +36,14 @@ Multi-genre Natural language inference (MNLI)
 Trained on masked language modeling objective. 
 
 ## System Design note for cloud 
-```mermaid
-flowchart TD
-    A[Vertex AI Training
-    (PyTorch Container)
-    --data=gs://...
-    --model_dir=gs://...] --> B[Cloud Storage (Model Artifacts)]
-    B --> C[Cloud Run FastAPI
-    (Prediction Service)
-    Loads model from GCS
-    Outputs to GCS]
+# Full AI Service Loop on GCP
+
+'''mermaid
+graph TB
+    A[Vertex AI Training<br>(PyTorch Container)<br>--data=gs://...<br>--model_dir=gs://...] --> B[Cloud Storage (Model Artifacts)]
+    B --> C[Cloud Run FastAPI<br>(Prediction Service)<br>Loads model from GCS<br>Outputs to GCS]
     C --> D[Cloud Storage (Input/Output Data)]
-    D --> E[React Frontend
-    (Containerized / Firebase)
-    Sends requests, shows results]
+    D --> E[React Frontend<br>(Containerized / Firebase)<br>Sends requests, shows results]
 
 
 ## GoogleColabs
