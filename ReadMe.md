@@ -45,8 +45,8 @@ graph TD;
     D[Custom Prediction Scripts<br/>Model server<br/> ]-->C;
     C-->E[Vertex AI];
     F[Training Jobs]-->E;
-    G[Prediction Jobs]--E;
-    
+    G[Prediction Jobs]-->E;
+
     
 ```
 
