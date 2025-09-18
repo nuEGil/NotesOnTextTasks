@@ -42,8 +42,7 @@ Trained on masked language modeling objective.
 graph TD;
 
     %% Training + Containers
-    A[Training Scripts<br/>TF or Torch] --> B[Container]
-    B --> C[**Artifact Registry**]
+    A[Training Scripts<br/>TF or Torch<br/Container>] --> C[**Artifact Registry**]
 
     %% Prediction scripts to Artifact Registry
     D[Custom Prediction Scripts<br/>Model server] --> C
@@ -58,8 +57,7 @@ graph TD;
     H & I & J --> K[**Storage Buckets**]
 
     %% Frontend + Cloud Run
-    L[Front End Web App] --> M[Container]
-    M --> N[**Cloud Run**]
+    L[Front End Web App<br/>/container] --> N[**Cloud Run**]
     N --> O[HTTP Requests]
     O --> E
     K --> L
