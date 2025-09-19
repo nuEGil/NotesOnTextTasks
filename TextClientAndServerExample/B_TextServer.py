@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Query
 import uvicorn
 import hashlib
+import urllib.parse
 
 '''This is an example of using a state machine to get one end point, but 4 different functions for that end point 
+Need the middleware to get stuff going in the web app. 
 '''
-
 app = FastAPI()
 
 # --- Transform functions ---
@@ -26,7 +27,7 @@ def upper_text(text: str) -> str:
 # --- State machine (dispatch table) ---
 TRANSFORMS = {
     "hash": hash_text,
-    "shift": shift_text,
+    "ascii_shift": shift_text,
     "reverse": reverse_text,
     "upper": upper_text,
 }
