@@ -2,11 +2,23 @@ from fastapi import FastAPI, Query
 import uvicorn
 import hashlib
 import urllib.parse
+from fastapi.middleware.cors import CORSMiddleware
 
-'''This is an example of using a state machine to get one end point, but 4 different functions for that end point 
-Need the middleware to get stuff going in the web app. 
+'''This is an example of using a state machine to get one end point,
+ but 4 different functions for that end point 
 '''
+# need this for the code to work with a web app
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500"],
+
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- Transform functions ---
 def hash_text(text: str) -> str:
@@ -35,6 +47,8 @@ TRANSFORMS = {
 # --- Endpoint ---
 @app.post("/transform")
 def transform(text: str = Query(...), mode: str = Query("hash")):
+    # Likely dont need this. Normalize text to handle both %20 and +
+    # decoded_text = urllib.parse.unquote_plus(text)
     func = TRANSFORMS.get(mode)
     if func:
         return {"mode": mode, "text": text, "result": func(text)}

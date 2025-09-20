@@ -1,3 +1,0 @@
-This runs with the A_TextApp.sh so that both scripts can be running 
-in parallel with eachother. Local host only is 127.0.0.1, with the 
-deve port as 8000. 

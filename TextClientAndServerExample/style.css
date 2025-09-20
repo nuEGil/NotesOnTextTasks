@@ -1,0 +1,59 @@
+
+.control_box {
+  display: inline-flex;              /* make it a flex container */
+  flex-direction: column;     /* stack children vertically */
+  align-items: flex-start;    /* align them to the left */
+  gap: 8px;                   /* spacing between file input and button */
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #f8f8f8;
+  width: auto;
+}
+
+.toggle_box {
+  display: inline-flex;       /* shrink to content */
+  flex-direction: column;     /* stack checkboxes vertically */
+  align-items: flex-start;    /* align labels left */
+  gap: 6px;                   /* space between checkboxes */
+  padding: 10px;
+  margin-top: 1rem;           /* space above */
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #f8f8f8;
+  width: auto;                /* auto-fit */
+  font-size: 0.95rem;
+}
+
+.toggle_box label {
+  cursor: pointer;
+  user-select: none;
+}
+
+textarea {
+  width: 600px;        /* fixed width */
+  height: 300px;       /* fixed height */
+  resize: none;        /* stop user resizing */
+  overflow: auto;      /* scroll when text overflows */
+  font-family: monospace;
+  white-space: pre;    /* keep tabs/spaces as typed */
+  padding: 0.5rem;     /* nicer spacing inside */
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+
+header, main {
+  background: rgba(255, 255, 255, 0.75); /* translucent white card look */
+  border-radius: 12px;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+body {
+  font-family: Arial, sans-serif;
+  background-image: url("assets/Creek.bmp");
+  background-size: cover;       /* fill the page */
+  background-position: center;  /* keep it centered */
+  background-repeat: no-repeat; /* no tiling */
+  height: 100vh; 
+}
+

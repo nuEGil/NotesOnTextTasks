@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- This is the text on the page up top in the browser tabs-->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Application</title>
+  <link rel="stylesheet" href="style.css" />
+  
+</head>
+
+<body>
+  
+  <main> 
+    
+    <div class="toggle_box">
+      Mode Toggle
+      <label><input type="checkbox" id="hash" checked> Hash </label>
+      <label><input type="checkbox" id="ascii_shift"> ASCII_Shift </label>
+      <label><input type="checkbox" id="reverse"> Reverse </label>
+      <label><input type="checkbox" id="upper"> Upper </label>
+    </div>
+    
+    <div class="control_box">
+      File select and clear 
+      <input type="file" id="fileInput" accept=".txt,.csv,.json">
+      <button id="clearBtn">Clear</button>
+      <button id="parseBtn">Parse Text</button>
+    </div>
+
+  <br><br>
+  <textarea id="textArea" placeholder="Type or upload a Text file here"></textarea>
+  
+</main>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
