@@ -38,7 +38,6 @@ Need to think of getting words that are within a window of sentences. because Ra
 
 '''
 
-
 def GetText(x):
     with open(x, "r" ) as f:
         return f.read()
@@ -208,6 +207,24 @@ def GetImportantPairs(LikelyPlayers):
     # return the resulting player list, and the pairs
     return npDC_2, pairs, pairs_counts
 
+def GetImportantPairsFromList(xx):
+    # take all the players from the dict and make pairs     
+    npDC_2 = np.array(xx) # source nodes
+
+    # number of players
+    n = len(npDC_2)
+
+    # Pairing players makes a square matrix - O(N^2) scaling so filter likely players
+    i, j = np.meshgrid(np.arange(n), np.arange(n), indexing="ij")
+    mask0 = i<j
+    pairs = np.column_stack((npDC_2[i[mask0]], npDC_2[j[mask0]])) # branches
+    pairs_counts = np.zeros((pairs.shape[0],))
+    print(pairs.shape, n)
+    print(pairs[0:10])
+    print(npDC_2)
+    # return the resulting player list, and the pairs
+    return npDC_2, pairs, pairs_counts
+
 def CleanSpecialChars(text: str) -> str:
     text = re.sub(r'[^A-Za-z0-9\s]', ' ', text)
     return re.sub(r'\s+', ' ', text).strip()
@@ -310,10 +327,9 @@ def DoSomething(node_list, pairs, sentences, sentence_window = 10):
 
     return running_char_set, pd_full_pairs_data
 
-
 if __name__ =='__main__':
-    # Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
-    Book = '/mnt/f/ebooks_public_domain/crime and punishment.txt'
+    # Book = '/mnt/f/data/ebooks_public_domain/crime and punishment.txt'
+    Book = '/mnt/f/data/ebooks_public_domain/crime and punishment.txt'
     text = GetText(Book)
     
     chars, special_chars = GetCharacters(text)
