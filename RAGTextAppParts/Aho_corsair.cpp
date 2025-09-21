@@ -1,12 +1,21 @@
-/*This script can be compiled into an executable that 
-reads a verry specific text file and looks for very specific 
+/*
+Plan --> make c++ files for any time we need to scan a lot of the text
+This script can be compiled into an executable that 
+reads a very specific text file and looks for very specific 
 words from a word list. then returns a json file with 
 everythin saved. Just need to modify 
 so that instead of a textfile load, it already has a loaded 
 string. And instead of a hard coded word list, it 
 gets a word list from the user..... hm. excecutable should 
 just have like an arg parse or something. but will update 
-later. */
+later. 
+
+OH but aho-corsair... it creates a trie structure from a word list
+so that when you read a character you only search through nodes 
+in a trie instead of the full word list. you can skip tons of 
+words this way if the next character doesnt match anything. It
+is used to autocomplete, and some other tasks. I noticed 
+scanning the full text with regex went slow. */
 
 
 #include <iostream>
