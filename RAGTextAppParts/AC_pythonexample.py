@@ -110,7 +110,7 @@ if __name__ == '__main__':
                 "rodion", "pulcheria", "alexandrovna", 
                 "dounia", "raskolnikov", "romanovitch", 
                 "porfiry", "pyotr", "petrovitch",
-                "dmitri", "prokofitch", "sofya", "semyonovna", 
+                "dmitri", "razumihin","prokofitch", "sofya", "semyonovna", 
                 "marmeladov","amalia", "fyodorovna",
                 "lebeziatnikov","darya","frantsovna", 
                 "katerina", "ivanovna", "fyodor", "dostoyevsky",

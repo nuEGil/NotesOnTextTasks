@@ -96,6 +96,7 @@ class LoadTextPage(QWidget):
         
         # alright now itterate through everything and start highlighting. it'll take a 
         # second to do though. 
+        selections = []
         for k,v in self.word_counts.items():
             keylen = len(k)
             for index in v:
@@ -104,7 +105,11 @@ class LoadTextPage(QWidget):
         
                 fmt = QTextCharFormat() 
                 fmt.setBackground(QColor('yellow'))
-                cursor.setCharFormat(fmt)
+                sel = QTextEdit.ExtraSelection()
+                sel.cursor = cursor
+                sel.format = fmt
+                selections.append(sel)
+        self.text_area.setExtraSelections(selections)
             
 
     def ResetButton_Function(self):
@@ -164,7 +169,7 @@ class SettingsPage(QWidget):
                 "rodion", "pulcheria", "alexandrovna", 
                 "dounia", "raskolnikov", "romanovitch", 
                 "porfiry", "pyotr", "petrovitch",
-                "dmitri", "prokofitch", "sofya", "semyonovna", 
+                "dmitri", "razumihin","prokofitch", "sofya", "semyonovna", 
                 "marmeladov","amalia", "fyodorovna",
                 "lebeziatnikov","darya","frantsovna", 
                 "katerina", "ivanovna", "fyodor", "dostoyevsky",
