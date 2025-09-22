@@ -197,7 +197,6 @@ if __name__ == '__main__':
     
     # read text
     input_file = "/mnt/f/data/ebooks_public_domain/crime and punishment.txt"
-    input_file = "crime and punishment.txt"
     text = GetText(input_file)
     
     # words 
