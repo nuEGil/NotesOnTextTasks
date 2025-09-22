@@ -20,3 +20,6 @@ Thumbs.db
 
 # any log files
 *.log
+
+# json files
+*.json
