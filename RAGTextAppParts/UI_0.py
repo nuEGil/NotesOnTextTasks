@@ -19,7 +19,6 @@ Minimize the number of button presses for a good demo man
 Need a way to group buttons together + functinonality. 
 '''
 
-
 class LoadTextPage(QWidget):
     def __init__(self):
         super().__init__()
@@ -89,7 +88,7 @@ class LoadTextPage(QWidget):
         cursor = self.text_area.textCursor()
         text_ = self.text_area.toPlainText().lower()
         
-        self.word_counts = ProcessTextWTrie(self.myTrie, text_, self.word_counts, savetag=False)
+        self.word_counts = ProcessTextWTrie(self.myTrie, text_, self.word_counts)
         self.word_counts = {k:v for k,v in self.word_counts.items() if len(k)>1}
         print(self.word_counts.keys())
         print('Highlighting i guess. ')
@@ -99,7 +98,7 @@ class LoadTextPage(QWidget):
         selections = []
         for k,v in self.word_counts.items():
             keylen = len(k)
-            for index in v:
+            for index in v['char_ids']:
                 cursor.setPosition(index)
                 cursor.setPosition(index + keylen, QTextCursor.MoveMode.KeepAnchor)  
         
@@ -111,7 +110,6 @@ class LoadTextPage(QWidget):
                 selections.append(sel)
         self.text_area.setExtraSelections(selections)
             
-
     def ResetButton_Function(self):
         # clear out the text area and clear out the data store. 
         self.text_area.setPlainText('')
@@ -169,17 +167,16 @@ class SettingsPage(QWidget):
                 "rodion", "pulcheria", "alexandrovna", 
                 "dounia", "raskolnikov", "romanovitch", 
                 "porfiry", "pyotr", "petrovitch",
-                "dmitri", "razumihin","prokofitch", "sofya", "semyonovna", 
+                "dmitri", "prokofitch", "sofya", "semyonovna", 
                 "marmeladov","amalia", "fyodorovna",
                 "lebeziatnikov","darya","frantsovna", 
                 "katerina", "ivanovna", "fyodor", "dostoyevsky",
-                "dostoevsky", "svidrigailov"
+                "dostoevsky",
                 ])
         
         # set the word list 
         self.KeyNameArea.setPlainText(','.join(self.word_list))
-
-        self.wordcounts = dict(zip(sorted(self.word_list), [[] for w in self.word_list]))
+        self.wordcounts = dict(zip(self.word_list, [{'char_ids':[], 'sentence_ids':[], 'sub_text':[]} for w in self.word_list]))
     
         # build the Trie
         self.myTrie = Trie()
