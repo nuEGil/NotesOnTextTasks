@@ -5,6 +5,8 @@ so like... not a totally big deal.
 
 got it to 160ms by making a function....maybe cause its pycached? so 2nd time running? 
 idk
+
+this can work for phrases too. so might be a good idea to experiment with that. 
 '''
 
 import os
