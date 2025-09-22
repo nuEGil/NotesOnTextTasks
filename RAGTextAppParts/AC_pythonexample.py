@@ -170,7 +170,9 @@ def GetPairSubtexts(text, N_sentences, sentence_starts,
         
     # stride of window length to make this thing go a bit faster and save less data. 
     # 10 sentences cause why not. 
-    pair_subtexting = {f'{a} : {b}':{'char_start':[] , 'char_end':[], 'sentence_id':[], 'sub_text':[]} for (a, b) in pairs}
+    pair_subtexting = {f'{a} : {b}':{'char_start':[] , 'char_end':[], 
+                                    'sentence_id':[], 'sub_text':[],
+                                    } for (a, b) in pairs}
     for sentence_idx in range(0, N_sentences - window_length, window_length):
         # for sentence_idx in range(len(sen))
         # so the next thing we want. 
@@ -185,6 +187,7 @@ def GetPairSubtexts(text, N_sentences, sentence_starts,
                 pair_subtexting[f'{a} : {b}']['char_end'].append(window_end)
                 pair_subtexting[f'{a} : {b}']['sentence_id'].append(sentence_idx)
                 pair_subtexting[f'{a} : {b}']['sub_text'].append(sub_text)
+                
     return pair_subtexting
 
 
@@ -194,18 +197,19 @@ if __name__ == '__main__':
     
     # read text
     input_file = "/mnt/f/data/ebooks_public_domain/crime and punishment.txt"
+    input_file = "crime and punishment.txt"
     text = GetText(input_file)
     
     # words 
     wordlist=sorted([
-                "rodion", "pulcheria", "alexandrovna", 
-                "dounia", "raskolnikov", "romanovitch", 
-                "porfiry", "pyotr", "petrovitch",
-                "dmitri", "razumihin","prokofitch", "sofya", "semyonovna", 
-                "marmeladov","amalia", "fyodorovna",
-                "lebeziatnikov","darya","frantsovna", 
-                "katerina", "ivanovna", "fyodor", "dostoyevsky",
-                "dostoevsky", "svidrigailov"
+                    "rodion", "pulcheria", "alexandrovna", 
+                    "dounia", "raskolnikov", "romanovitch", 
+                    "porfiry", "pyotr", "petrovitch",
+                    "dmitri", "razumihin","prokofitch", "sofya", "semyonovna", 
+                    "marmeladov","amalia", "fyodorovna",
+                    "lebeziatnikov","darya","frantsovna", 
+                    "katerina", "ivanovna", "fyodor", "dostoyevsky",
+                    "dostoevsky", "svidrigailov"
                 ])
     
     # word count dictionary.... 
@@ -236,6 +240,13 @@ if __name__ == '__main__':
     pair_subtexting = GetPairSubtexts(text, len(sentence_ends), sentence_starts, 
                                       sentence_ends, wordcounts, pairs,  window_length = 8)
     
+    # filter the pairs
+    pair_subtexting = {k:v for k,v in pair_subtexting.items() if len(v['char_start'])>10}
+    
+
+    end_time = time.time()
+    print("Elapsed : ", end_time - start_time, "seconds")
+
 
     # write jsons so we can do something with it later. 
     with open("py_word_trie.json", "w") as f:
@@ -244,6 +255,4 @@ if __name__ == '__main__':
     with open("pair_stuff.json", "w") as f:
         json.dump(pair_subtexting, f, indent=4)
 
-    end_time = time.time()
-    print("Elapsed : ", end_time - start_time, "seconds")
     
