@@ -2,6 +2,7 @@
 This gives a description of the directories for each part of the project. 
 
 ## TODO 
+0. Make a mermaid diagram for the demo flow and tool set
 1. Make more web apps   
     * UI/UX  host on github pages
     *  should be able to do static only with animations + project descriptions
