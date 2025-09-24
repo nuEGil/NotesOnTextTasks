@@ -1,6 +1,6 @@
 import re
 import sys
-from TapeReader import GetSentences
+from sandbox.TapeReader import GetSentences
 from AC_pythonexample import TrieNode, Trie, ProcessTextWTrie
 
 from PyQt6.QtCore import pyqtSignal

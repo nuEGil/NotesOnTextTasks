@@ -1,5 +1,5 @@
 import sys
-from TapeReader import GetSentences, GetImportantPairsFromList
+from RAGTextAppParts.sandbox.TapeReader import GetSentences, GetImportantPairsFromList
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QFileDialog, 
     QHBoxLayout, QTextEdit, QPushButton, QLabel, 
