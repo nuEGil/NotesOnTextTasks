@@ -2,11 +2,17 @@
 This gives a description of the directories for each part of the project. 
 
 ## TODO 
-1. Make more web apps *  UI/UX * > host on github pages *  should be able to do static only with animations + project descriptions
-2. Use Wikipedia REST API to get pages. Need to make a parser to get Word freqeuncy lists + dictionary pages from Wiktionary * > wikipedia has the REST API, Witkionary returns HTML pages. 
+1. Make more web apps   
+    * UI/UX  host on github pages
+    *  should be able to do static only with animations + project descriptions
+2. Use Wikipedia REST API to get pages. 
+    * Need to make a parser to get Word freqeuncy lists + dictionary pages from Wiktionary 
+    *  wikipedia has the REST API, Witkionary returns HTML pages. 
 3. Create a heirarchical text dataset from task 2. 
 4. Train a text classifier for the heirarchical relationships
-5. Make a text embedding + look up table. No need for the final layer of a word model to have N words output shape. consider binary,or an embedding structure to have less outputs but still represent all words. 
+5. Make a text embedding + look up table. 
+    * No need for the final layer of a word model to have N words output shape. 
+    * consider binary,or an embedding structure to have less outputs but still represent all words. 
 
 ## RAGTextAppParts
 Making the parts for a text application that uses Retrieval Augmented Generation. Focusing in on the retreival part, and data object generation for now. 
@@ -42,7 +48,8 @@ Sandbox/
 4. TapeReader.py 
     *  Secondary pass that uses regex patterns to pull paragraphs, sentences, gets nouns, but has some hard filtereing steps to reduce the number of word pairs used for the graph construction. Checks for the occurence of word pairs in windows of words (n sentences). Currently gets end count of word pairs 
     *  going to expand to get indices of increment for the word pairs 
-    *  then save the whole thing to a JSON. So you have word1, word2, list of indices. * > from there we can do text classifiers to look for more interesting relationships. 
+    *  then save the whole thing to a JSON. So you have word1, word2, list of indices. 
+    *  from there we can do text classifiers to look for more interesting relationships. 
 
 5. Graph_making.py 
     *  use pyvis to make an html graph of the csv file dumped from TapeReader.py.
@@ -53,7 +60,7 @@ Sandbox/
 7. SimpleTextGen_HF.py 
     *  simple demo for getting LLM outputs from a local model 
     *  need to tack this on to the end of AC_PythonExample.py 
-    *  extracted sentences can be used as payloads to provide context for querries submitted to LLM * > RAG approach.
+    *  extracted sentences can be used as payloads to provide context for querries submitted to LLM + RAG approach.
 
 8. ParagraphFiltAndSummary_HF.py 
     *  designing a prompt for summarizing text, more RAG approach. 
@@ -124,13 +131,15 @@ graph TD;
 
 ## GoogleColabs
 1. CardiacSignalsStuff.ipynb
-This example uses the MIT-BIH arrhymia data set (copy on physionet) which contains ECG signals from multiple views along with data like patient age, sex, and medication lists. The data was taken in the 80s and digitized. In this example we load some of the data with the wfdb library, show the frequency spectrum and filter the signal. I also wrote a simple algorithm to extract the R-R intervals. I generate prompts given the patient meta data and the R-R intervals, and pass those prompts to gpt2 using the huggingface hosted gpt2 model. There's some interesting results here. The model definitely needs some finetuning, but it is a cool way to test out something of a full pipeline that involves: signal loading, cleaning, windowing, phyisological feature extraction, followed by prompting for text generation. The options here would be to fine tune gpt2 or to put some more work into the SimpleTextGen_tensorflow.py model. But for now this is enough. 
+    * This example uses the MIT-BIH arrhymia data set (copy on physionet) which contains ECG signals from multiple views along with data like patient age, sex, and medication lists. The data was taken in the 80s and digitized. In this example we load some of the data with the wfdb library, show the frequency spectrum and filter the signal. I also wrote a simple algorithm to extract the R-R intervals. I generate prompts given the patient meta data and the R-R intervals, and pass those prompts to gpt2 using the huggingface hosted gpt2 model. There's some interesting results here. The model definitely needs some finetuning, but it is a cool way to test out something of a full pipeline that involves: signal loading, cleaning, windowing, phyisological feature extraction, followed by prompting for text generation. The options here would be to fine tune gpt2 or to put some more work into the SimpleTextGen_tensorflow.py model. But for now this is enough. 
 
-2. Designing Text Retrieval Functions.ipynb *  this uses regular expresions to get paragraphs, sentences, and quotes from the text. Then looks for double caps words to and has a filter right after to get first name + last names of some characters. Theres a section on building pairs and finding those pairs within sentence windows. Plots a directed word graph, the sentence number that word pairs occur within the text, and a plot on the introduction of new words in general.  
+2. Designing Text Retrieval Functions.ipynb 
+    *  this uses regular expresions to get paragraphs, sentences, and quotes from the text. Then looks for double caps words to and has a filter right after to get first name + last names of some characters. Theres a section on building pairs and finding those pairs within sentence windows. Plots a directed word graph, the sentence number that word pairs occur within the text, and a plot on the introduction of new words in general.  
 
 3. Building Knowledge Graphs.ipynb - consider ommitting this. 
 
-4. Experimenting with Hugging Face.ipynb *  first pass at parsing text with hugging face models. 
+4. Experimenting with Hugging Face.ipynb 
+    *first pass at parsing text with hugging face models. 
 
 ## TransformerTurorials
 1. AndrejKarpathy_SimpleTextGen_pytorch.py
