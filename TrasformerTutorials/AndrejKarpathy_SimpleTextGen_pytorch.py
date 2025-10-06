@@ -136,7 +136,7 @@ def modeltraining(model, text_data_train, block_size=8, batchsize = 32, N_steps 
     print('steps: training loss: ', loss.item())
 
     # predict again but not shakespear
-    tokens_oout = Bmod.generate(torch.zeros((1,1), dtype=torch.long), max_new_tokens=100)
+    tokens_oout = model.generate(torch.zeros((1,1), dtype=torch.long), max_new_tokens=100)
     tokens_oout = decode(tokens_oout[0].tolist())
     print(tokens_oout) # prints out nonsense before training. 
 
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     '''
  
     # read a book
-    fpath = '/mnt/f/ebooks_public_domain/Poisonous snakes of texas and first aid treatment of their bites.txt'
+    fpath = "/mnt/f/data/ebooks_public_domain/Crime_and_Punishment.txt"
     text = LoadTextChars(fpath)
 
     # get set of unique characters - in a list object

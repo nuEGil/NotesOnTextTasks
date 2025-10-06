@@ -34,6 +34,9 @@ Introduced a new folder called SandBox, to keep some legacy scripts that aren't 
     
     * GUI needs some work so that the tabs arent as cluttered, and theres less buttons. BUT, right now it is geared so that the user can work through the demo from left to right, so keep on that. need to add 3rd tab to show JSON output.. it's long though. 4th tab would show the graph. and maybe a 5th would have connection to a Hugging face model like gemma-250 or gpt2 (see sandbox scripts with HF suffix for simple implementation.)
 
+4. hf_embed_classify.py
+    * Uses hugging face DistilBertTokenizer, DistilBertModel to classify text
+
 ---
 Sandbox/
 1. Aho_Corasick.cpp 
