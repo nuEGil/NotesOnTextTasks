@@ -113,7 +113,7 @@ class Trie():
 
 def GetSubText(word_set, text, window = 400, ):
     # Testing out just a specific snippet of text
-    print('Searching text for any examples of key word')
+    # print('Searching text for any examples of key word')
     window = window // 2
     # itterate through the key words. 
     subdata = {}
@@ -131,6 +131,7 @@ def GetSubText(word_set, text, window = 400, ):
 
 if __name__ == '__main__':
     # start time 
+    start_time = time.time()
     # Start with whole words, but we do have the 
     # capability to get patial words and phrases w prefix matcher
     wordlist = sorted(['love', 'passion', 'faith', 'war'
@@ -167,31 +168,37 @@ if __name__ == '__main__':
 
     # read all the text we have and then dump to a json... 
     # basedir = '/mnt/f/data/ebooks_public_domain'
-    basedir = '/mnt/c/Users/gil82/Documents/books/books/'
-    filenames = glob.glob(os.path.join(basedir, '*.txt')) # this is a different list than the next one
+    base_dir = os.environ['BOOK_DIR']
+    book_dir = os.path.join(base_dir, "books/")
+    output_dir = os.path.join(base_dir, "outputs/") 
+    print('env dir = ', book_dir)
+
+    filenames = glob.glob(os.path.join(book_dir, '*.txt')) # this is a different list than the next one
     
     full_data_set = {}
     for fi, ff in enumerate(filenames):
-        start_time = time.time()
+        
         # read the text file 
-        text = GetText(os.path.join(basedir, ff))
+        text = GetText(os.path.join(book_dir, ff))
         # text = CleanSpecialChars(text)
         # search for the words in word set 
         word_set = Trie0.TextSearch(text.lower())
 
         sub_dat = GetSubText(word_set, text, window = 200, )
-        print(sub_dat)
+        # print(sub_dat)
     
         full_data_set[fi]={
                             'id':fi,
                             'name' : ff.replace('.txt',''),
                             'word_set':sub_dat}
-        end_time = time.time()
-        print(f"File: {ff} time elapsed:{end_time - start_time}")
-        break
+        
+    
 
-    with open('dataset.json', 'w') as f:
+    with open(os.path.join(output_dir,'dataset.json'), 'w') as f:
         json.dump(full_data_set, f, indent = 4)
+
+    end_time = time.time()
+    print(f"Total time elapsed:{end_time - start_time}")
 
     
     
