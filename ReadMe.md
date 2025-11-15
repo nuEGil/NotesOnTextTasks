@@ -2,18 +2,15 @@
 This gives a description of the directories for each part of the project. 
 
 ## TODO 
-0. Make a mermaid diagram for the demo flow and tool set
-1. Make more web apps   
-    * UI/UX  host on github pages
-    *  should be able to do static only with animations + project descriptions
-2. Use Wikipedia REST API to get pages. 
+1. Use Wikipedia REST API to get pages. 
     * Need to make a parser to get Word freqeuncy lists + dictionary pages from Wiktionary 
-    *  wikipedia has the REST API, Witkionary returns HTML pages. 
-3. Create a heirarchical text dataset from task 2. 
-4. Train a text classifier for the heirarchical relationships
-5. Make a text embedding + look up table. 
+    * wikipedia has the REST API, Witkionary returns HTML pages. 
+2. Create a heirarchical text dataset from task 2. 
+3. Train a text classifier for the heirarchical relationships
+4. Make a text embedding + look up table. 
     * No need for the final layer of a word model to have N words output shape. 
     * consider binary,or an embedding structure to have less outputs but still represent all words. 
+5. Continue to prototype out the search bar. maybe add the llm in the backend to do llm assist search. 
 
 ## Search Bar
 Search bar feature comes up in basically every application. for the book data analysis I figured I'd make a script to parse the text files into an sql data base with time stamps and key word matches -- WordCheck.py. Then the TextServer.py serves the UI (main.html+style.css+script.js) as well as parses requests to the sql database. The server responds with every entry in the database that has that particular key word... I need to make a vector out of the key words or something, then add those hash values to the sqlite data base so I can search up hash values. 
