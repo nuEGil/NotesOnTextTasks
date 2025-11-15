@@ -15,6 +15,11 @@ This gives a description of the directories for each part of the project.
     * No need for the final layer of a word model to have N words output shape. 
     * consider binary,or an embedding structure to have less outputs but still represent all words. 
 
+## Search Bar
+Search bar feature comes up in basically every application. for the book data analysis I figured I'd make a script to parse the text files into an sql data base with time stamps and key word matches -- WordCheck.py. Then the TextServer.py serves the UI (main.html+style.css+script.js) as well as parses requests to the sql database. The server responds with every entry in the database that has that particular key word... I need to make a vector out of the key words or something, then add those hash values to the sqlite data base so I can search up hash values. 
+
+but no really, Google + Ask Jeeves, Bing --> the UI is a search bar right in the middle of the page + a bunch of nlp + page rank and search algos in the background... open all the apps on your phone -- youll find search bars in like 90% of them. Every phone app is basically a nice HTTP request front end. The magic comes from how you do some of the user usage prediction to know when to store things on the device or when to get new information from the server via request. 
+
 ## RAGTextAppParts
 Making the parts for a text application that uses Retrieval Augmented Generation. Focusing in on the retreival part, and data object generation for now. 
 

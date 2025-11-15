@@ -1,0 +1,43 @@
+body {
+    margin: 0;
+    background: #f7f7f7;
+    font-family: Arial, sans-serif;
+}
+
+/* Top-left label */
+.page-label {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Center the search bar at the top */
+.search-top {
+    width: 100%;
+    text-align: center;
+    margin-top: 70px; /* pushes it down slightly, adjust as needed */
+}
+
+input[type="text"] {
+    padding: 10px;
+    width: 300px;
+    font-size: 16px;
+}
+
+input[type="submit"] {
+    padding: 10px;
+    font-size: 16px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+/* Display area for your future magic */
+.content-display {
+    margin: 100px auto 0 auto;
+    width: 80%;
+    max-width: 800px;
+    font-size: 18px;
+    line-height: 1.5;
+}
