@@ -72,7 +72,7 @@ def WriteSQL(results, output_dir):
                 file_id INTEGER NOT NULL,
                 line_id INTEGER,
                 text TEXT,
-                wordset TEXT, -- store JSON string here
+                wordset TEXT,
                 timestamp TEXT,
                 FOREIGN KEY (file_id) REFERENCES files(id));
                 """)
