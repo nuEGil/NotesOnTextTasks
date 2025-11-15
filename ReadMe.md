@@ -20,6 +20,8 @@ Search bar feature comes up in basically every application. for the book data an
 
 but no really, Google + Ask Jeeves, Bing --> the UI is a search bar right in the middle of the page + a bunch of nlp + page rank and search algos in the background... open all the apps on your phone -- youll find search bars in like 90% of them. Every phone app is basically a nice HTTP request front end. The magic comes from how you do some of the user usage prediction to know when to store things on the device or when to get new information from the server via request. 
 
+Check out NanoChat, their UI is like this too. --> https://github.com/karpathy/nanochat
+
 ## RAGTextAppParts
 Making the parts for a text application that uses Retrieval Augmented Generation. Focusing in on the retreival part, and data object generation for now. 
 
