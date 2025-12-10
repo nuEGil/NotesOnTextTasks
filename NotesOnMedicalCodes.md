@@ -57,7 +57,7 @@ __See SmallNetTraining/ for a tokenizer, then a small text architecture + traini
 
 __See RAGTextAppParts/hf_embed_classifiy.py for a simple example of using DistilBERT from hugging face in a classification example__
 
-__See TransformerTutorials/ for pytorch and tensorflow implementations of transformers__
+__See TransformerTutorials/ for tensorflow implementations of transformers__
 
 
 ## ICD-10-PCS 
