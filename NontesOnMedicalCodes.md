@@ -51,6 +51,8 @@ Then you pick some start token, and \0\0 is the end token
 \0 is a null char. then build a tokenizer script based on this. pad the context. 
 select context window length based on mean + 2 standard deviations of the max note length. 
 
+__See SmallNetTraining/ for a tokenizer, then a small text architecture + training script.__
+
 
 ## ICD-10-PCS 
 __inpatient procedure codes__
