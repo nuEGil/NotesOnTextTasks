@@ -37,7 +37,7 @@ Add a start and stop token and thats 38^2 = 1444 vocab size. so instead of a tra
 Split the context, input and output sequences like this
 full context = Notes, Full output = V97.33XD (unlikely code)
 
-| Sample ID | Context                 | Input    | Output |
+| Sample ID | Context                  | Input    | Output |
 |-----------|--------------------------|----------|--------|
 | 0         | Notes                    | `[Start]`| V9     |
 | 1         | Notes`[Start]`           | V9       | 73     |
@@ -51,8 +51,15 @@ Then you pick some start token, and \0\0 is the end token
 \0 is a null char. then build a tokenizer script based on this. pad the context. 
 select context window length based on mean + 2 standard deviations of the max note length. 
 
+This is a starting point for architecture design. but then the following directories have the parts necessary to build out and train this type of custom architecture. 
+
 __See SmallNetTraining/ for a tokenizer, then a small text architecture + training script.__
 
+__See RAGTextAppParts/hf_embed_classifiy.py for a simple example of using DistilBERT from hugging face in a classification example__
+
+__See TransformerTutorials/ for pytorch and tensorflow implementations of transformers__
+
+ 
 
 ## ICD-10-PCS 
 __inpatient procedure codes__
