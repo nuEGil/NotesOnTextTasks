@@ -60,8 +60,8 @@ __See RAGTextAppParts/hf_embed_classifiy.py for a simple example of using Distil
 __See TransformerTutorials/ for tensorflow implementations of transformers__
 
 
-PhysioNet has an open access data base here for more examples of ICD codes, but it's just the ICD and the corresponding name.. Realistically we would want accompanying notes that led to the diagnosis. 
- 
+PhysioNet has an open access data base here for more examples of ICD codes, but it's just the ICD and the corresponding name.. Realistically we would want accompanying notes that led to the diagnosis, but the triage file gives you the cheif complaint. 
+
 https://physionet.org/content/mimic-iv-ed-demo/2.2/ed/#files-panel
 
 
