@@ -60,10 +60,25 @@ __See RAGTextAppParts/hf_embed_classifiy.py for a simple example of using Distil
 __See TransformerTutorials/ for tensorflow implementations of transformers__
 
 
+### Open access Physionet data for more examples
 PhysioNet has an open access data base here for more examples of ICD codes, but it's just the ICD and the corresponding name.. Realistically we would want accompanying notes that led to the diagnosis, but the triage file gives you the cheif complaint. 
 
 https://physionet.org/content/mimic-iv-ed-demo/2.2/ed/#files-panel
 
+### Cancer codes
+Codes fall within the C00-C97 range for malignant neoplasms (Cancers) ICD-10-CM -- ie some codes group 
+* COO - C97 : general range for all malignant neoplasms
+* C00 - C75 : primary cancers of specific sites (C15-C26 for digestive organs, C50 for breast)
+* C76 - C80 :  
+
+### Doctor note formats
+Another key thing. Doctors have note formats
+
+SOAP - Gold standard -- Subjective, Objective, Assessment, Plan
+
+BIRP - Popular in mental health, Behavior, Intervention, Response, Plan
+
+Cheif Complaint - More concise, focusing on the main reason for the visit
 
 ## ICD-10-PCS 
 __inpatient procedure codes__
