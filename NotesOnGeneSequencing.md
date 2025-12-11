@@ -115,3 +115,29 @@ Predict nucleotides as a function of SMILE : SMILE Representation -> Nucleotide 
 Predict Chemical structure as a function of nucleotide sequence:  Nucleotide sequence -> SMILE representation 
 
 get a bi-directional model going. 
+
+## Some data structures 
+Base structure is an array for the full text sequence
+
+K-mers / n-grams (sub sequence windows): 3-mers, 5-mers, 9-mers but these are sliding windows, can use hash based indexing. Good for sequence alignment and motif discovery. Protein family classification 
+
+Position specific scoring matrices (PSSM)
+matrix of shape Lx20 giving prob of each amino acid at each position -- built from multiple sequence alignments (MSA) -- heavy use in evolutionary modeling and structure prediction.
+
+Seq1: M--TNP-KPQRKTK--
+Seq2: MSTTNP-KPQR-TK-
+Seq3: M-TTNP-KPQRSTK-P
+
+MSAs are the data structure for AlphaFold, ESMFold...
+
+Protein 3D strcuture data structure 
+
+PDB format (Protein Data Bank) -- rows of atoms with atom ID, residue name, xyz coords, chain id.
+
+Atom Graphs : nodes are atoms, edges are bonds or distance threasholds, and then features are charge, atom type, aromaticity -- GNN like graphformer and GVP. 
+
+Residue Graphs: nodes are amin acids, edges are proximity <8 angstromgs so back bone links, side chain orientation -- protein- protein interaction pred, and fold classification 
+
+Distance maps / contact maps -- LxL matrix where each entry is distance beteween residues 
+
+Torsion angle sequences -- represent protein as a sequence of rotations, phi, gamma, and chi. 
